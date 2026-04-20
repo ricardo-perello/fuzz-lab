@@ -1,0 +1,6 @@
+findings/
+findings-qemu/
+png_fuzz
+png_fuzz_qemu
+plot_output/
+plot_output_qemu/
