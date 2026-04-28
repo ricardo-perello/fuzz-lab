@@ -82,7 +82,9 @@ RUN printf '#include <png.h>\nint main(void){\n  png_structp p = png_create_read
         -o /tmp/check_vanilla && \
     echo "Both library builds verified OK"
 
-# ── Copy Makefile and dictionary; src/ and seeds/ are volume-mounted at runtime
+# ── Copy project files ────────────────────────────────────────────────────────
 COPY Makefile /build/Makefile
+COPY src/     /build/src/
+COPY seeds/   /build/seeds/
 
 WORKDIR /build
