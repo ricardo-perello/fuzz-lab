@@ -1,3 +1,12 @@
 png_fuzz
 png_fuzz_qemu
 png_fuzz_persistent
+png_fuzz_api
+png_fuzz_write_api
+png_fuzz_metadata_api
+findings-api/
+findings-api-smoke/
+findings-write-api/
+findings-write-api-smoke/
+findings-metadata-api/
+findings-metadata-api-smoke/

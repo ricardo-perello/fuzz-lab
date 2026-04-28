@@ -87,5 +87,9 @@ RUN printf '#include <png.h>\nint main(void){\n  png_structp p = png_create_read
 COPY Makefile /build/Makefile
 COPY src/     /build/src/
 COPY seeds/   /build/seeds/
+COPY seeds-api/ /build/seeds-api/
+COPY seeds-write/ /build/seeds-write/
+COPY seeds-metadata/ /build/seeds-metadata/
+COPY pocs/    /build/pocs/
 
 WORKDIR /build
