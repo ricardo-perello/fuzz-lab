@@ -26,6 +26,7 @@ RUN apt-get update && apt-get install -y \
     zlib1g-dev \
     flex \
     bison \
+    gnuplot \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /build

@@ -1,0 +1,6 @@
+# environment variables:
+AFL_CUSTOM_INFO_PROGRAM=./png_fuzz_qemu
+AFL_CUSTOM_INFO_PROGRAM_ARGV=@@
+AFL_CUSTOM_INFO_OUT=findings-qemu/default
+# command line:
+'afl-fuzz' '-Q' '-i' 'seeds' '-o' 'findings-qemu' '-x' 'dictionaries/png.dict' '--' './png_fuzz_qemu' '@@'
