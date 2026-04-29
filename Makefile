@@ -12,6 +12,7 @@ LDFLAGS_VANILLA := -lz -lm
 
 PARALLEL ?= 8
 AFL_PARALLEL_ENV ?= AFL_NO_UI=1 AFL_SKIP_CPUFREQ=1
+PNG_DICT ?= /build/dictionaries/png.dict
 
 .PHONY: build build-qemu build-persistent build-api build-write-api build-metadata-api fuzz fuzz-qemu fuzz-persistent fuzz-api fuzz-write-api fuzz-metadata-api fuzz-parallel fuzz-qemu-parallel fuzz-persistent-parallel fuzz-api-parallel fuzz-write-api-parallel fuzz-metadata-api-parallel clean
 
@@ -60,15 +61,15 @@ build-metadata-api:
 
 fuzz: build
 	mkdir -p findings
-	afl-fuzz -i seeds -o findings -x dictionaries/png.dict -- ./png_fuzz @@
+	afl-fuzz -i seeds -o findings -x $(PNG_DICT) -- ./png_fuzz @@
 
 fuzz-qemu: build-qemu
 	mkdir -p findings-qemu
-	afl-fuzz -Q -i seeds -o findings-qemu -x dictionaries/png.dict -- ./png_fuzz_qemu @@
+	afl-fuzz -Q -i seeds -o findings-qemu -x $(PNG_DICT) -- ./png_fuzz_qemu @@
 
 fuzz-persistent: build-persistent
 	mkdir -p findings-persistent
-	afl-fuzz -i seeds -o findings-persistent -x dictionaries/png.dict -- ./png_fuzz_persistent @@
+	afl-fuzz -i seeds -o findings-persistent -x $(PNG_DICT) -- ./png_fuzz_persistent @@
 
 fuzz-api: build-api
 	mkdir -p findings-api
@@ -85,27 +86,27 @@ fuzz-metadata-api: build-metadata-api
 fuzz-parallel: build
 	mkdir -p findings
 	@echo "Starting $(PARALLEL) AFL++ workers in findings"
-	@$(AFL_PARALLEL_ENV) afl-fuzz -i seeds -o findings -x dictionaries/png.dict -M main -- ./png_fuzz @@ & \
+	@$(AFL_PARALLEL_ENV) afl-fuzz -i seeds -o findings -x $(PNG_DICT) -M main -- ./png_fuzz @@ & \
 	for i in $$(seq 2 $(PARALLEL)); do \
-		$(AFL_PARALLEL_ENV) afl-fuzz -i seeds -o findings -x dictionaries/png.dict -S worker$$i -- ./png_fuzz @@ & \
+		$(AFL_PARALLEL_ENV) afl-fuzz -i seeds -o findings -x $(PNG_DICT) -S worker$$i -- ./png_fuzz @@ & \
 	done; \
 	wait
 
 fuzz-qemu-parallel: build-qemu
 	mkdir -p findings-qemu
 	@echo "Starting $(PARALLEL) AFL++ QEMU workers in findings-qemu"
-	@$(AFL_PARALLEL_ENV) afl-fuzz -Q -i seeds -o findings-qemu -x dictionaries/png.dict -M main -- ./png_fuzz_qemu @@ & \
+	@$(AFL_PARALLEL_ENV) afl-fuzz -Q -i seeds -o findings-qemu -x $(PNG_DICT) -M main -- ./png_fuzz_qemu @@ & \
 	for i in $$(seq 2 $(PARALLEL)); do \
-		$(AFL_PARALLEL_ENV) afl-fuzz -Q -i seeds -o findings-qemu -x dictionaries/png.dict -S worker$$i -- ./png_fuzz_qemu @@ & \
+		$(AFL_PARALLEL_ENV) afl-fuzz -Q -i seeds -o findings-qemu -x $(PNG_DICT) -S worker$$i -- ./png_fuzz_qemu @@ & \
 	done; \
 	wait
 
 fuzz-persistent-parallel: build-persistent
 	mkdir -p findings-persistent
 	@echo "Starting $(PARALLEL) AFL++ persistent workers in findings-persistent"
-	@$(AFL_PARALLEL_ENV) afl-fuzz -i seeds -o findings-persistent -x dictionaries/png.dict -M main -- ./png_fuzz_persistent @@ & \
+	@$(AFL_PARALLEL_ENV) afl-fuzz -i seeds -o findings-persistent -x $(PNG_DICT) -M main -- ./png_fuzz_persistent @@ & \
 	for i in $$(seq 2 $(PARALLEL)); do \
-		$(AFL_PARALLEL_ENV) afl-fuzz -i seeds -o findings-persistent -x dictionaries/png.dict -S worker$$i -- ./png_fuzz_persistent @@ & \
+		$(AFL_PARALLEL_ENV) afl-fuzz -i seeds -o findings-persistent -x $(PNG_DICT) -S worker$$i -- ./png_fuzz_persistent @@ & \
 	done; \
 	wait
 
