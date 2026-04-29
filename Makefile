@@ -11,7 +11,7 @@ LDFLAGS_INSTR   := -fsanitize=address -lz -lm
 LDFLAGS_VANILLA := -lz -lm
 
 PARALLEL ?= 8
-AFL_ENV ?= AFL_SKIP_CPUFREQ=1 ASAN_OPTIONS=detect_leaks=0
+AFL_ENV ?= AFL_SKIP_CPUFREQ=1 ASAN_OPTIONS=abort_on_error=1:detect_leaks=0:symbolize=0
 AFL_PARALLEL_ENV ?= AFL_NO_UI=1 $(AFL_ENV)
 PNG_DICT ?= /build/dictionaries/png.dict
 
