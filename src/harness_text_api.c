@@ -65,7 +65,8 @@ static char *bounded_string(const FuzzInput *in, size_t off, size_t max_len, con
 
     size_t n = in->size - off;
     if (n > max_len) n = max_len;
-    char *out = malloc(n + 1);
+    size_t out_len = n > fallback_len ? n : fallback_len;
+    char *out = malloc(out_len + 1);
     if (!out) return NULL;
     memcpy(out, in->data + off, n);
     out[n] = 0;
