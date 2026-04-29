@@ -11,7 +11,8 @@ LDFLAGS_INSTR   := -fsanitize=address -lz -lm
 LDFLAGS_VANILLA := -lz -lm
 
 PARALLEL ?= 8
-AFL_PARALLEL_ENV ?= AFL_NO_UI=1 AFL_SKIP_CPUFREQ=1
+AFL_ENV ?= AFL_SKIP_CPUFREQ=1 ASAN_OPTIONS=detect_leaks=0
+AFL_PARALLEL_ENV ?= AFL_NO_UI=1 $(AFL_ENV)
 PNG_DICT ?= /build/dictionaries/png.dict
 
 .PHONY: build build-qemu build-persistent build-api build-write-api build-metadata-api fuzz fuzz-qemu fuzz-persistent fuzz-api fuzz-write-api fuzz-metadata-api fuzz-parallel fuzz-qemu-parallel fuzz-persistent-parallel fuzz-api-parallel fuzz-write-api-parallel fuzz-metadata-api-parallel clean
@@ -61,27 +62,27 @@ build-metadata-api:
 
 fuzz: build
 	mkdir -p findings
-	afl-fuzz -i seeds -o findings -x $(PNG_DICT) -- ./png_fuzz @@
+	$(AFL_ENV) afl-fuzz -i seeds -o findings -x $(PNG_DICT) -- ./png_fuzz @@
 
 fuzz-qemu: build-qemu
 	mkdir -p findings-qemu
-	afl-fuzz -Q -i seeds -o findings-qemu -x $(PNG_DICT) -- ./png_fuzz_qemu @@
+	$(AFL_ENV) afl-fuzz -Q -i seeds -o findings-qemu -x $(PNG_DICT) -- ./png_fuzz_qemu @@
 
 fuzz-persistent: build-persistent
 	mkdir -p findings-persistent
-	afl-fuzz -i seeds -o findings-persistent -x $(PNG_DICT) -- ./png_fuzz_persistent @@
+	$(AFL_ENV) afl-fuzz -i seeds -o findings-persistent -x $(PNG_DICT) -- ./png_fuzz_persistent @@
 
 fuzz-api: build-api
 	mkdir -p findings-api
-	afl-fuzz -i seeds-api -o findings-api -- ./png_fuzz_api @@
+	$(AFL_ENV) afl-fuzz -i seeds-api -o findings-api -- ./png_fuzz_api @@
 
 fuzz-write-api: build-write-api
 	mkdir -p findings-write-api
-	afl-fuzz -i seeds-write -o findings-write-api -- ./png_fuzz_write_api @@
+	$(AFL_ENV) afl-fuzz -i seeds-write -o findings-write-api -- ./png_fuzz_write_api @@
 
 fuzz-metadata-api: build-metadata-api
 	mkdir -p findings-metadata-api
-	afl-fuzz -i seeds-metadata -o findings-metadata-api -- ./png_fuzz_metadata_api @@
+	$(AFL_ENV) afl-fuzz -i seeds-metadata -o findings-metadata-api -- ./png_fuzz_metadata_api @@
 
 fuzz-parallel: build
 	mkdir -p findings
