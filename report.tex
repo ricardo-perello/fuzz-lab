@@ -1,0 +1,211 @@
+\documentclass[letterpaper,twocolumn,10pt]{article}
+\usepackage{usenix-2020-09}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{hyperref}
+
+\title{\Large CS-412 Software Security Fuzzing Lab\\Fuzzing \texttt{libpng} with AFL++}
+
+\author{
+Group 7\\
+EPFL --- Spring 2026
+}
+
+\date{}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+% 4-6 lines max: target, setup, key result, and takeaway.
+This report presents a coverage-guided fuzzing campaign of \texttt{libpng} using AFL++ in both instrumented and QEMU modes. We describe harness design, build instrumentation, seed and dictionary strategy, campaign metrics, crash triage, and attack-surface limitations. We also compare performance and coverage across fuzzing configurations, including persistent mode.
+\end{abstract}
+
+\section{Setup and Methodology (Short Context)}
+% Keep this section brief; most grading is in Q1--Q8.
+\textbf{Target and version.} % e.g., libpng 1.2.56
+
+\textbf{Environment.} % docker image, toolchain, key make targets
+
+\textbf{Campaign durations.} % instrumented >=30 min, qemu >=30 min
+
+\textbf{Artifacts reference.} % mention appendix figures/tables
+
+\section{Evaluation Questions}
+\noindent\textit{Each subsection below corresponds to one graded question (0--5 points).}
+
+\subsection{Q1 --- Harness Design (0--5 points)}
+\textbf{What to answer.}
+\begin{itemize}[leftmargin=*]
+  \item Identify the chosen entry-point function(s) and justify why they are high-value fuzz targets.
+  \item Discuss alternatives considered (e.g., decoder vs encoder, high-level vs low-level API) and why you rejected/kept them.
+  \item Trace end-to-end data flow: AFL++ input file \(\rightarrow\) harness buffer/callback \(\rightarrow\) libpng APIs.
+  \item Explain every guard (error handling, dimension/resource limits, etc.) and why it helps fuzzing quality.
+\end{itemize}
+\textbf{Example angle from handout.}
+\begin{itemize}[leftmargin=*]
+  \item Decoder pipeline: \texttt{png\_set\_read\_fn()} + \texttt{png\_read\_info()} + \texttt{png\_read\_image()} to exercise chunk parsing, decompression, and filter logic.
+\end{itemize}
+\textbf{Your content.} % write 1-2 compact paragraphs
+
+\subsection{Q2 --- Instrumentation and Sanitizers (0--5 points)}
+\textbf{What to answer.}
+\begin{itemize}[leftmargin=*]
+  \item List all compiler/linker flags used for the instrumented build.
+  \item List all patches (notably CRC neutralization) and where they apply.
+  \item For each flag/patch: explain purpose and what breaks/degrades if omitted.
+\end{itemize}
+\textbf{Example angle from handout.}
+\begin{itemize}[leftmargin=*]
+  \item \texttt{-fsanitize=address} catches memory errors; without it, many bugs may not crash deterministically.
+  \item Disabling CRC checks in \texttt{png\_crc\_finish()} improves path discovery by letting mutated chunks reach deeper parsers.
+\end{itemize}
+\textbf{Your content.} % include concrete command lines or table
+
+\subsection{Q3 --- Seed Corpus and Dictionary (0--5 points)}
+\textbf{What to answer.}
+\begin{itemize}[leftmargin=*]
+  \item Describe seed selection strategy and why seeds are diverse/valid.
+  \item Describe dictionary tokens and what format elements they encode.
+  \item Quantify contributions from dictionary/havoc/splice using your AFL++ status numbers.
+  \item Explain dictionary entries in formal terms (grammar/language-theory perspective).
+\end{itemize}
+\textbf{Example angle from handout.}
+\begin{itemize}[leftmargin=*]
+  \item Tokens such as \texttt{IHDR}, \texttt{PLTE}, \texttt{IDAT}, \texttt{IEND} represent grammar terminals/chunk-type symbols that guide structured mutations.
+\end{itemize}
+\textbf{Your content.} % include exact numbers from your run
+
+\subsection{Q4 --- Campaign Analysis (0--5 points)}
+\textbf{What to answer.}
+\begin{itemize}[leftmargin=*]
+  \item Report: stability, corpus count, map density, cycles done.
+  \item Include and interpret the edges-over-time curve (\texttt{afl-plot}).
+  \item Argue with evidence whether saturation was reached.
+\end{itemize}
+\textbf{Example angle from handout.}
+\begin{itemize}[leftmargin=*]
+  \item Early steep edge growth then plateau; reference concrete timestamps and metric values.
+\end{itemize}
+\textbf{Your content.} % 1 concise paragraph + pointers to appendix figures
+
+\subsection{Q5 --- Crash Triage (0--5 points)}
+\textbf{What to answer.}
+\begin{itemize}[leftmargin=*]
+  \item If crashes found: reproduce, minimize with \texttt{afl-tmin}, collect ASan trace, identify bug class and possible CVE.
+  \item If no crashes: inject synthetic bug, fuzz for 60s, show detection, then justify why no real bugs were found.
+\end{itemize}
+\textbf{Example angle from handout.}
+\begin{itemize}[leftmargin=*]
+  \item Workflow: reproduce \(\rightarrow\) minimize \(\rightarrow\) ASan diagnosis with command/output evidence.
+\end{itemize}
+\textbf{Your content.} % include command snippets and observed output summary
+
+\subsection{Q6 --- Attack Surface Analysis (0--5 points)}
+\textbf{What to answer.}
+\begin{itemize}[leftmargin=*]
+  \item Name two real applications using libpng.
+  \item Describe one concrete attacker scenario involving untrusted PNG processing.
+  \item Identify at least two code paths in these applications not covered by your harness, with function/file references.
+  \item Explain security impact of those coverage gaps.
+\end{itemize}
+\textbf{Example angle from handout.}
+\begin{itemize}[leftmargin=*]
+  \item Compare app-level decoding pipelines versus isolated library harness: metadata handling, I/O wrappers, transformation configuration differences.
+\end{itemize}
+\textbf{Your content.}
+
+\subsection{Q7 --- Binary-Only Fuzzing with QEMU (0--5 points)}
+\textbf{What to answer.}
+\begin{itemize}[leftmargin=*]
+  \item Run the uninstrumented target with \texttt{afl-fuzz -Q}.
+  \item Compare instrumented vs QEMU at equal wall-clock time on:
+  \begin{itemize}[leftmargin=*]
+    \item exec speed,
+    \item edges discovered,
+    \item corpus count.
+  \end{itemize}
+  \item Explain why numbers differ using compile-time instrumentation vs runtime QEMU translation/coverage.
+\end{itemize}
+\textbf{Example angle from handout.}
+\begin{itemize}[leftmargin=*]
+  \item QEMU mode is slower due to dynamic translation/emulation overhead; still useful for binary-only targets.
+\end{itemize}
+\textbf{Your content.} % include side-by-side numeric mini-table
+
+\subsection{Q8 --- Instrumentation Depth and Performance (0--5 points)}
+\textbf{What to answer.}
+\begin{itemize}[leftmargin=*]
+  \item Report instrumented edge counts at startup for:
+  \begin{itemize}[leftmargin=*]
+    \item (a) library alone,
+    \item (b) final harness binary.
+  \end{itemize}
+  \item Explain count differences (linking scope/reachable code).
+  \item Compare map density against total instrumented edges and explain why many edges remain unreached.
+  \item Measure exec speed for:
+  \begin{itemize}[leftmargin=*]
+    \item no sanitizer + fork,
+    \item ASan + fork,
+    \item ASan + persistent mode.
+  \end{itemize}
+  \item Explain each slowdown/speedup source (sanitizer overhead, fork elimination).
+\end{itemize}
+\textbf{Example angle from handout.}
+\begin{itemize}[leftmargin=*]
+  \item Persistent mode (\texttt{AFL\_LOOP}) reduces process creation overhead and can significantly increase exec/sec.
+\end{itemize}
+\textbf{Your content.}
+
+\section{Conclusion}
+% 1 short paragraph: what worked, what limits remained, key comparison takeaway.
+
+\appendix
+\section{Appendix: Evidence and Figures (Not Counted Toward 4-Page Limit)}
+\textbf{Checklist to include in appendix.}
+\begin{itemize}[leftmargin=*]
+  \item AFL++ status screenshot (instrumented campaign).
+  \item AFL++ status screenshot (QEMU campaign).
+  \item \texttt{afl-plot} edges graph (instrumented).
+  \item \texttt{afl-plot} edges graph (QEMU).
+  \item Crash triage screenshots/log excerpts (or synthetic bug validation evidence).
+  \item Optional: command/output snippets for edge counts and exec-speed measurements.
+\end{itemize}
+
+\section{Appendix: Quick Fill-In Tables}
+\begin{table}[h]
+\centering
+\caption{Core campaign metrics (fill with your values).}
+\begin{tabular}{lcc}
+\toprule
+Metric & Instrumented & QEMU \\
+\midrule
+Duration (min) &  &  \\
+Exec speed (exec/s) &  &  \\
+Edges discovered &  &  \\
+Corpus count &  &  \\
+Stability (\%) &  &  \\
+Map density (\%) &  &  \\
+Cycles done &  &  \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[h]
+\centering
+\caption{Q8 performance configurations (same harness).}
+\begin{tabular}{lc}
+\toprule
+Configuration & Exec speed (exec/s) \\
+\midrule
+No sanitizer + fork mode &  \\
+ASan + fork mode &  \\
+ASan + persistent mode &  \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\end{document}
