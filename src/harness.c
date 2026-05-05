@@ -92,9 +92,19 @@ int main(int argc, char **argv){
  
     png_set_read_fn(png, in, read_cb);
     png_read_info(png, info);
+
+    if (png_get_image_width(png, info) > 4096 ||
+        png_get_image_height(png, info) > 4096)
+        return cleanup_and_return(0, in, fd, &png, &info, rows, height);
+
     png_set_expand(png);
     png_set_strip_16(png);
     png_set_gray_to_rgb(png);
+
+    png_color_16 bg = {0, 0, 0, 0, 0};
+    png_set_background(png, &bg, PNG_BACKGROUND_GAMMA_SCREEN, 0, 1.0);
+    png_set_gamma(png, 2.2, 0.45455);
+
     png_read_update_info(png, info);
 
     height = png_get_image_height(png, info);
