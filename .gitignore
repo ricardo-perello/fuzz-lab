@@ -6,7 +6,11 @@ png_fuzz_write_api
 png_fuzz_metadata_api
 findings-api/
 findings-api-smoke/
+findings-api-cve-*/
 findings-write-api/
 findings-write-api-smoke/
 findings-metadata-api/
 findings-metadata-api-smoke/
+findings-metadata-api-rerun-*/
+findings-persistent/
+findings-qemu-prev-*/
