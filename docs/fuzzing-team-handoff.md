@@ -43,6 +43,14 @@ This is the current shared state for the libpng 1.2.56 fuzzing lab work.
 - Excluded: the first metadata API crash set was caused by our harness fallback allocation bug, then fixed and rerun cleanly.
 - Excluded for now: the persistent campaign's two saved crash files did not reproduce as standalone ASan crashes.
 
+## Shared Triage Artifacts
+
+The compact triage bundle is in `triage-artifacts/`.
+
+It includes `cmdline`, `fuzzer_stats`, `plot_data`, saved crash inputs, and saved hang inputs for the local and pwnbox campaigns. It intentionally excludes full `queue/` corpora, `fastresume.bin`, `fuzz_bitmap`, and other bulky AFL++ generated files.
+
+Use `triage-artifacts/README.md` as the starting point for crash and hang triage.
+
 ## Lab Question Readiness
 
 - Q1 Harness design: ready.
@@ -57,7 +65,7 @@ This is the current shared state for the libpng 1.2.56 fuzzing lab work.
 ## Actionable Team Tasks
 
 1. Crash triage owner
-   - Pick one representative crash from `findings-api-cve-212823`.
+   - Pick one representative crash from `triage-artifacts/local/findings-api-cve-212823`.
    - Run `afl-tmin`.
    - Save the minimized input and final ASan trace.
    - Deduplicate the 90 crash files at the root-cause level.
