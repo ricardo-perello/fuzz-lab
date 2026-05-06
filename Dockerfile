@@ -57,6 +57,16 @@ RUN cp -r libpng-1.2.56 libpng-instrumented && \
     make -j$(nproc) && \
     make install
 
+# ── Instrumented build (afl-clang-fast, no sanitizer) ─────────────────────────
+RUN cp -r libpng-1.2.56 libpng-instrumented-no-asan && \
+    cd libpng-instrumented-no-asan && \
+    patch -p0 < /build/patches/libpng-1.2.56-no-crc.patch && \
+    CC=afl-clang-fast \
+    CFLAGS="-g -O1" \
+    ./configure --disable-shared --prefix=/build/install_no_asan && \
+    make -j$(nproc) && \
+    make install
+
 # ── Vanilla build (gcc, no sanitizers, no AFL++ instrumentation) ───────────────
 RUN cp -r libpng-1.2.56 libpng-vanilla && \
     cd libpng-vanilla && \
@@ -77,11 +87,15 @@ RUN printf '#include <png.h>\nint main(void){\n  png_structp p = png_create_read
         -I/build/install/include \
         /build/install/lib/libpng12.a -lz -lm \
         -o /tmp/check_instr && \
+    afl-clang-fast -g -O1 /tmp/check.c \
+        -I/build/install_no_asan/include \
+        /build/install_no_asan/lib/libpng12.a -lz -lm \
+        -o /tmp/check_instr_no_asan && \
     gcc -g -O1 /tmp/check.c \
         -I/build/install_vanilla/include \
         /build/install_vanilla/lib/libpng12.a -lz -lm \
         -o /tmp/check_vanilla && \
-    echo "Both library builds verified OK"
+    echo "All library builds verified OK"
 
 # ── Copy project files ────────────────────────────────────────────────────────
 COPY Makefile /build/Makefile

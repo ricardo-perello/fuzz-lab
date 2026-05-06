@@ -2,12 +2,15 @@ CC_INSTR     := afl-clang-fast
 CC_VANILLA   := gcc
 
 CFLAGS_INSTR   := -fsanitize=address -g -O1
+CFLAGS_NO_ASAN := -g -O1
 CFLAGS_VANILLA := -g -O1
 
 INSTALL_DIR         := /build/install
+INSTALL_DIR_NO_ASAN := /build/install_no_asan
 INSTALL_DIR_VANILLA := /build/install_vanilla
 
 LDFLAGS_INSTR   := -fsanitize=address -lz -lm
+LDFLAGS_NO_ASAN := -lz -lm
 LDFLAGS_VANILLA := -lz -lm
 
 PARALLEL ?= 8
@@ -15,7 +18,7 @@ AFL_ENV ?= AFL_SKIP_CPUFREQ=1 ASAN_OPTIONS=abort_on_error=1:detect_leaks=0:symbo
 AFL_PARALLEL_ENV ?= AFL_NO_UI=1 $(AFL_ENV)
 PNG_DICT ?= /build/dictionaries/png.dict
 
-.PHONY: build build-qemu build-persistent build-api build-write-api build-metadata-api fuzz fuzz-qemu fuzz-persistent fuzz-api fuzz-write-api fuzz-metadata-api fuzz-parallel fuzz-qemu-parallel fuzz-persistent-parallel fuzz-api-parallel fuzz-write-api-parallel fuzz-metadata-api-parallel clean
+.PHONY: build build-no-asan build-qemu build-persistent build-api build-write-api build-metadata-api fuzz fuzz-qemu fuzz-persistent fuzz-api fuzz-write-api fuzz-metadata-api fuzz-parallel fuzz-qemu-parallel fuzz-persistent-parallel fuzz-api-parallel fuzz-write-api-parallel fuzz-metadata-api-parallel clean
 
 build:
 	$(CC_INSTR) $(CFLAGS_INSTR) src/harness.c \
@@ -30,6 +33,13 @@ build-qemu:
 		$(INSTALL_DIR_VANILLA)/lib/libpng12.a \
 		$(LDFLAGS_VANILLA) \
 		-o png_fuzz_qemu
+
+build-no-asan:
+	$(CC_INSTR) $(CFLAGS_NO_ASAN) src/harness.c \
+		-I$(INSTALL_DIR_NO_ASAN)/include \
+		$(INSTALL_DIR_NO_ASAN)/lib/libpng12.a \
+		$(LDFLAGS_NO_ASAN) \
+		-o png_fuzz_no_asan
 
 build-persistent:
 	$(CC_INSTR) $(CFLAGS_INSTR) src/harness_persistent.c \
@@ -139,5 +149,5 @@ fuzz-metadata-api-parallel: build-metadata-api
 	wait
 
 clean:
-	rm -f png_fuzz png_fuzz_qemu png_fuzz_persistent png_fuzz_api png_fuzz_write_api png_fuzz_metadata_api
+	rm -f png_fuzz png_fuzz_no_asan png_fuzz_qemu png_fuzz_persistent png_fuzz_api png_fuzz_write_api png_fuzz_metadata_api
 	rm -rf findings findings-qemu findings-persistent findings-api findings-write-api findings-metadata-api
