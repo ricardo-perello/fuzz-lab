@@ -6,6 +6,9 @@
 #include <setjmp.h>
 #include <string.h>
 
+#define MAX_IMAGE_DIMENSION 4096U
+#define MAX_DECODED_BYTES (16U * 1024U * 1024U)
+
 typedef struct {
     uint8_t *data;
     size_t size;
@@ -93,8 +96,8 @@ int main(int argc, char **argv){
     png_set_read_fn(png, in, read_cb);
     png_read_info(png, info);
 
-    if (png_get_image_width(png, info) > 4096 ||
-        png_get_image_height(png, info) > 4096)
+    if (png_get_image_width(png, info) > MAX_IMAGE_DIMENSION ||
+        png_get_image_height(png, info) > MAX_IMAGE_DIMENSION)
         return cleanup_and_return(0, in, fd, &png, &info, rows, height);
 
     png_set_expand(png);
@@ -109,6 +112,9 @@ int main(int argc, char **argv){
 
     height = png_get_image_height(png, info);
     png_size_t rowbytes = png_get_rowbytes(png, info);
+    if (height == 0 || rowbytes == 0 ||
+        rowbytes > MAX_DECODED_BYTES / (size_t)height)
+        return cleanup_and_return(0, in, fd, &png, &info, rows, height);
 
     rows = calloc(height, sizeof(*rows));
     if (!rows) return cleanup_and_return(1, in, fd, &png, &info, rows, height);

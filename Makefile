@@ -18,7 +18,7 @@ AFL_ENV ?= AFL_SKIP_CPUFREQ=1 ASAN_OPTIONS=abort_on_error=1:detect_leaks=0:symbo
 AFL_PARALLEL_ENV ?= AFL_NO_UI=1 $(AFL_ENV)
 PNG_DICT ?= /build/dictionaries/png.dict
 
-.PHONY: build build-no-asan build-qemu build-persistent build-api build-write-api build-metadata-api fuzz fuzz-qemu fuzz-persistent fuzz-api fuzz-write-api fuzz-metadata-api fuzz-parallel fuzz-qemu-parallel fuzz-persistent-parallel fuzz-api-parallel fuzz-write-api-parallel fuzz-metadata-api-parallel clean
+.PHONY: build build-no-asan build-qemu build-persistent build-progressive build-api build-write-api build-metadata-api fuzz fuzz-qemu fuzz-persistent fuzz-progressive fuzz-api fuzz-write-api fuzz-metadata-api fuzz-parallel fuzz-qemu-parallel fuzz-persistent-parallel fuzz-progressive-parallel fuzz-api-parallel fuzz-write-api-parallel fuzz-metadata-api-parallel clean
 
 build:
 	$(CC_INSTR) $(CFLAGS_INSTR) src/harness.c \
@@ -47,6 +47,13 @@ build-persistent:
 		$(INSTALL_DIR)/lib/libpng12.a \
 		$(LDFLAGS_INSTR) \
 		-o png_fuzz_persistent
+
+build-progressive:
+	$(CC_INSTR) $(CFLAGS_INSTR) src/harness_progressive.c \
+		-I$(INSTALL_DIR)/include \
+		$(INSTALL_DIR)/lib/libpng12.a \
+		$(LDFLAGS_INSTR) \
+		-o png_fuzz_progressive
 
 build-api:
 	$(CC_INSTR) $(CFLAGS_INSTR) src/harness_text_api.c \
@@ -81,6 +88,10 @@ fuzz-qemu: build-qemu
 fuzz-persistent: build-persistent
 	mkdir -p findings-persistent
 	$(AFL_ENV) afl-fuzz -i seeds -o findings-persistent -x $(PNG_DICT) -- ./png_fuzz_persistent @@
+
+fuzz-progressive: build-progressive
+	mkdir -p findings-progressive
+	$(AFL_ENV) afl-fuzz -i seeds -o findings-progressive -x $(PNG_DICT) -- ./png_fuzz_progressive @@
 
 fuzz-api: build-api
 	mkdir -p findings-api
@@ -121,6 +132,15 @@ fuzz-persistent-parallel: build-persistent
 	done; \
 	wait
 
+fuzz-progressive-parallel: build-progressive
+	mkdir -p findings-progressive
+	@echo "Starting $(PARALLEL) AFL++ progressive workers in findings-progressive"
+	@$(AFL_PARALLEL_ENV) afl-fuzz -i seeds -o findings-progressive -x $(PNG_DICT) -M main -- ./png_fuzz_progressive @@ & \
+	for i in $$(seq 2 $(PARALLEL)); do \
+		$(AFL_PARALLEL_ENV) afl-fuzz -i seeds -o findings-progressive -x $(PNG_DICT) -S worker$$i -- ./png_fuzz_progressive @@ & \
+	done; \
+	wait
+
 fuzz-api-parallel: build-api
 	mkdir -p findings-api
 	@echo "Starting $(PARALLEL) AFL++ workers in findings-api"
@@ -149,5 +169,5 @@ fuzz-metadata-api-parallel: build-metadata-api
 	wait
 
 clean:
-	rm -f png_fuzz png_fuzz_no_asan png_fuzz_qemu png_fuzz_persistent png_fuzz_api png_fuzz_write_api png_fuzz_metadata_api
-	rm -rf findings findings-qemu findings-persistent findings-api findings-write-api findings-metadata-api
+	rm -f png_fuzz png_fuzz_no_asan png_fuzz_qemu png_fuzz_persistent png_fuzz_progressive png_fuzz_api png_fuzz_write_api png_fuzz_metadata_api
+	rm -rf findings findings-qemu findings-persistent findings-progressive findings-api findings-write-api findings-metadata-api

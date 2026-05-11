@@ -1,9 +1,12 @@
 png_fuzz
 png_fuzz_qemu
 png_fuzz_persistent
+png_fuzz_progressive
 png_fuzz_api
 png_fuzz_write_api
 png_fuzz_metadata_api
+findings-progressive/
+findings-progressive-smoke/
 findings-api/
 findings-api-smoke/
 findings-api-cve-*/
