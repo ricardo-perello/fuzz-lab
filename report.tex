@@ -65,19 +65,73 @@ This report presents a coverage-guided fuzzing campaign of \texttt{libpng} using
 \end{itemize}
 \textbf{Your content.} % include concrete command lines or table
 
-\subsection{Q3 --- Seed Corpus and Dictionary (0--5 points)}
-\textbf{What to answer.}
-\begin{itemize}[leftmargin=*]
-  \item Describe seed selection strategy and why seeds are diverse/valid.
-  \item Describe dictionary tokens and what format elements they encode.
-  \item Quantify contributions from dictionary/havoc/splice using your AFL++ status numbers.
-  \item Explain dictionary entries in formal terms (grammar/language-theory perspective).
-\end{itemize}
-\textbf{Example angle from handout.}
-\begin{itemize}[leftmargin=*]
-  \item Tokens such as \texttt{IHDR}, \texttt{PLTE}, \texttt{IDAT}, \texttt{IEND} represent grammar terminals/chunk-type symbols that guide structured mutations.
-\end{itemize}
-\textbf{Your content.} % include exact numbers from your run
+\subsection{Q3 --- Seed Corpus and Dictionary}
+The campaign starts from ten small valid PNGs in \texttt{seeds/} (69--1388
+bytes, 3909 bytes in total). They cover RGB, RGBA, greyscale, greyscale+alpha,
+16-bit greyscale, indexed colour with \texttt{PLTE} and \texttt{tRNS}
+transparency, \texttt{iTXt} text metadata, Adam7 interlacing, and
+multi-\texttt{IDAT}/\texttt{hIST} cases. The point of keeping them small is
+that AFL++ calibrates and mutates each seed many times per second, so wasted
+bytes are wasted budget. The point of the diversity is that each seed already
+sits past the PNG signature and IHDR gate in a different state, so havoc
+mutation immediately exercises palette handling, ancillary chunks, zlib
+decompression, and scanline filters instead of having to first invent a valid
+container from random bytes.
+
+All reader campaigns add the AFL++ PNG dictionary with
+\texttt{-x /build/dictionaries/png.dict}. The Docker image copies it from the
+AFL++ distribution and the Makefile exposes it as \texttt{PNG\_DICT}. The
+useful entries are the PNG signature and the four-byte chunk type tokens
+(\texttt{IHDR}, \texttt{PLTE}, \texttt{IDAT}, \texttt{IEND}, \texttt{tRNS},
+\texttt{gAMA}, \texttt{tEXt}, and others). PNG is a binary grammar of the
+shape \(\mathit{File} \to \mathit{Signature}\ \mathit{Chunk}^{+}\) where each
+chunk is \texttt{length / type / data / CRC}. The dictionary gives AFL++ the
+terminal tokens for the signature and the type field; chunk ordering, lengths, 
+CRCs, filter bytes, and compressed IDAT payloads are all semantic structure the 
+mutator then discovers through coverage feedback.
+
+For the per-strategy yield numbers we needed AFL++'s live status rows, which
+the fuzzer does not write to \texttt{fuzzer\_stats} or \texttt{plot\_data}. We
+captured them from two short 300~s supplementary runs and preserved the
+transcripts and an extracted summary in \texttt{evidence/q3-live/}. The first
+run kept deterministic stages on (13{,}109 execs, 804 edges) so the
+dictionary row would actually fill in; the second used \texttt{-z -u} to skip
+deterministic stages and reach havoc/splice fast enough inside the 300~s
+budget (12{,}650 execs, 721 edges). These are evidence runs for Q3, not the
+canonical Q4 campaign.
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{lrrr}
+\toprule
+\textbf{Strategy} & \textbf{Finds} & \textbf{Attempts} & \textbf{Yield} \\
+\midrule
+Dictionary overwrite & 55 & 2{,}726 & 2.02\% \\
+Dictionary insert & 0 & 2{,}754 & 0.00\% \\
+Havoc & 61 & 6{,}500 & 0.94\% \\
+Splice & 4 & 420 & 0.95\% \\
+\bottomrule
+\end{tabular}
+\caption{AFL++ strategy yields from the live status captures.}
+\end{table}
+
+Dictionary \emph{overwrite} is the high-precision, low-volume operator: it
+replaces a few existing bytes with a known token, so a malformed four-byte
+chunk type can flip in one mutation to something the parser recognises and
+advance to the next validation or decompression stage. That is why it
+delivers the best yield (2.02\%). Dictionary \emph{insert} is the same
+operation without the alignment constraint, and on PNG it spends its budget
+breaking chunk lengths; in this run it found nothing in 2{,}754 attempts.
+Havoc is lower precision but higher volume: stacked random flips, overwrites,
+insertions, deletions, and size changes mostly break chunk alignment or
+compressed data, but 6{,}500 attempts give the mutator plenty of chances to
+land on a useful perturbation of dimensions, filter bytes, or payloads, which
+explains 61 finds at a 0.94\% yield. Splice has the highest variance because
+gluing two PNG inputs together usually leaves IHDR, PLTE, and IDAT
+inconsistent with each other, but a clean chunk-boundary recombination can
+still expose a new parser state -- 4 finds in 420 attempts is what that looks
+like in practice.
 
 \subsection{Q4 --- Campaign Analysis (0--5 points)}
 \textbf{What to answer.}
