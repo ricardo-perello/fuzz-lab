@@ -217,23 +217,58 @@ the main worker; campaign-wide totals come from summing per-worker
 \end{itemize}
 \textbf{Your content.}
 
-\subsection{Q7 --- Binary-Only Fuzzing with QEMU (0--5 points)}
-\textbf{What to answer.}
-\begin{itemize}[leftmargin=*]
-  \item Run the uninstrumented target with \texttt{afl-fuzz -Q}.
-  \item Compare instrumented vs QEMU at equal wall-clock time on:
-  \begin{itemize}[leftmargin=*]
-    \item exec speed,
-    \item edges discovered,
-    \item corpus count.
-  \end{itemize}
-  \item Explain why numbers differ using compile-time instrumentation vs runtime QEMU translation/coverage.
-\end{itemize}
-\textbf{Example angle from handout.}
-\begin{itemize}[leftmargin=*]
-  \item QEMU mode is slower due to dynamic translation/emulation overhead; still useful for binary-only targets.
-\end{itemize}
-\textbf{Your content.} % include side-by-side numeric mini-table
+\subsection{Q7 --- Binary-Only Fuzzing with QEMU}
+We ran the decoder twice on the same machine: the normal
+\texttt{afl-clang-fast} ASan build and an uninstrumented \texttt{gcc -g -O1}
+build launched with \texttt{afl-fuzz -Q}. Both used the same ten seeds, the
+same PNG dictionary, and the same CRC-neutralised libpng. Wall-clock times are
+close enough (1{,}945~s vs.\ 1{,}927~s) for a direct comparison; the
+canonical artefacts are \texttt{findings/default/} and
+\texttt{findings-qemu/default/} with matching \texttt{plot\_output*/}
+directories.
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{lrr}
+\toprule
+\textbf{Metric} & \textbf{Instrumented} & \textbf{QEMU} \\
+\midrule
+Runtime & 1{,}945~s & 1{,}927~s \\
+Executions & 1{,}034{,}958 & 1{,}111{,}274 \\
+Exec speed & 532.08/s & 576.56/s \\
+Corpus count & 715 & 801 \\
+Edges found / total & 966 / 3{,}122 & 2{,}730 / 65{,}536 \\
+Bitmap coverage & 30.94\% & 4.17\% \\
+Crashes / hangs & 0 / 2 & 0 / 0 \\
+\bottomrule
+\end{tabular}
+\caption{Same-time decoder campaign comparison.}
+\end{table}
+
+The results do not mean that QEMU covered more source code necessarily. The two rows count
+edges in different spaces. The instrumented build has AFL++ counters
+compiled into every basic block of the harness and libpng, so its
+3{,}122-edge denominator is the actual edge universe of that binary. QEMU
+mode runs the vanilla binary under user-mode translation (the
+\texttt{target\_mode} line in \texttt{fuzzer\_stats} reads
+\texttt{qemu shmem\_testcase}) and hashes translated control flow into
+AFL++'s fixed 64K-slot bitmap. So 2{,}730 QEMU edges and 4.17\% density are
+on a different scale than 966 compiler-instrumented edges and 30.94\%
+density; the QEMU number is bigger because the slot space is bigger, not
+because more code ran.
+
+Speed flipped in QEMU's favour for the same reason. Usually
+binary-translation slows things down, but our QEMU binary turns off
+ASan and AFL++ counters and the instrumented build is paying ASan's
+shadow-memory checks on every load and store. Dropping ASan from the
+instrumented build switches the ordering back again. The practical tradeoff
+is not really speed: QEMU mode lets us fuzz when we cannot recompile
+the target (real-world black-box fuzzing), but it gives up ASan's silent-corruption 
+detection. A heap-buffer-overflow that does not happen to land on an unmapped page
+will produce wrong pixels in QEMU mode and a clear stack trace in the
+instrumented run.
+
 
 \subsection{Q8 --- Instrumentation Depth and Performance (0--5 points)}
 \textbf{What to answer.}
