@@ -20,8 +20,17 @@ EPFL --- Spring 2026
 \maketitle
 
 \begin{abstract}
-% 4-6 lines max: target, setup, key result, and takeaway.
-This report presents a coverage-guided fuzzing campaign of \texttt{libpng} using AFL++ in both instrumented and QEMU modes. We describe harness design, build instrumentation, seed and dictionary strategy, campaign metrics, crash triage, and attack-surface limitations. We also compare performance and coverage across fuzzing configurations, including persistent mode.
+We fuzz \texttt{libpng} 1.2.56 with AFL++ in three configurations:
+source-instrumented with ASan, AFL-instrumented without ASan, and QEMU
+mode against a vanilla \texttt{gcc} build. The decoder harness drives
+\texttt{png\_read\_info}, transforms, \texttt{png\_read\_image}, and
+\texttt{png\_read\_end} on ten small PNG seeds with the AFL++ PNG
+dictionary and a CRC-neutralised libpng. The 32-minute instrumented run
+reaches 966 of 3{,}122 edges (30.94\% bitmap) and saturates locally; a
+text-API harness reproduces a CVE-2016-10087-style heap-buffer-overflow
+in \texttt{png\_set\_text\_2}. We use the QEMU and persistent runs to
+discuss the limits of edge-count and bitmap comparisons across
+instrumentation sources.
 \end{abstract}
 
 \section{Setup and Methodology (Short Context)}
@@ -338,51 +347,32 @@ The persistent-mode caveat is the one from Q4: when stability dips below
 100\%, saved crashes need standalone replay before you call them bugs.
 
 \section{Conclusion}
-% 1 short paragraph: what worked, what limits remained, key comparison takeaway.
+We exercised the libpng 1.2.56 decoder under AFL++ with three complementary
+configurations: a 32-minute instrumented ASan campaign for the canonical
+Q4/Q5/Q7 numbers, six-hour parallel campaigns for trend evidence, and a
+QEMU run for the binary-only comparison. The text-API harness produced a
+reproducible heap-buffer-overflow in \texttt{png\_set\_text\_2}; the decoder
+harness produced none, which the 30.94\% bitmap reading frames honestly --
+we covered the easy parts of the decoder under this seed and dictionary
+budget, not all of libpng. The most useful takeaway across Q7 and Q8 is
+that "more edges" only means "more code" when the edges come from the same
+instrumentation source: QEMU's 64K bitmap and ASan's shadow checks are
+features we trade against each other depending on what we are looking for.
 
 \appendix
-\section{Appendix: Evidence and Figures (Not Counted Toward 4-Page Limit)}
-\textbf{Checklist to include in appendix.}
-\begin{itemize}[leftmargin=*]
-  \item AFL++ status screenshot (instrumented campaign).
-  \item AFL++ status screenshot (QEMU campaign).
-  \item \texttt{afl-plot} edges graph (instrumented).
-  \item \texttt{afl-plot} edges graph (QEMU).
-  \item Crash triage screenshots/log excerpts (or synthetic bug validation evidence).
-  \item Optional: command/output snippets for edge counts and exec-speed measurements.
+\section{Appendix: Evidence Artifacts (Not Counted Toward 4-Page Limit)}
+The main report numbers above come from the following files:
+\begin{itemize}
+  \item Instrumented campaign:
+  \texttt{findings/default/fuzzer\_stats},
+  \texttt{findings/default/plot\_data},
+  \texttt{plot\_output/}.
+  \item QEMU campaign:
+  \texttt{findings-qemu/\allowbreak{}default/\allowbreak{}fuzzer\_stats},
+  \texttt{findings-qemu/\allowbreak{}default/\allowbreak{}plot\_data},
+  \texttt{plot\_output\_qemu/}.
+  \item Q8 edge counts: \texttt{evidence/q8-edge-counts/}.
+  \item Q8 speed measurements: \texttt{evidence/q8-speed/}.
 \end{itemize}
-
-\section{Appendix: Quick Fill-In Tables}
-\begin{table}[h]
-\centering
-\caption{Core campaign metrics (fill with your values).}
-\begin{tabular}{lcc}
-\toprule
-Metric & Instrumented & QEMU \\
-\midrule
-Duration (min) &  &  \\
-Exec speed (exec/s) &  &  \\
-Edges discovered &  &  \\
-Corpus count &  &  \\
-Stability (\%) &  &  \\
-Map density (\%) &  &  \\
-Cycles done &  &  \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\begin{table}[h]
-\centering
-\caption{Q8 performance configurations (same harness).}
-\begin{tabular}{lc}
-\toprule
-Configuration & Exec speed (exec/s) \\
-\midrule
-No sanitizer + fork mode &  \\
-ASan + fork mode &  \\
-ASan + persistent mode &  \\
-\bottomrule
-\end{tabular}
-\end{table}
 
 \end{document}
