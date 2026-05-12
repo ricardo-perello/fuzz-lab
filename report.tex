@@ -20,8 +20,17 @@ EPFL --- Spring 2026
 \maketitle
 
 \begin{abstract}
-% 4-6 lines max: target, setup, key result, and takeaway.
-This report presents a coverage-guided fuzzing campaign of \texttt{libpng} using AFL++ in both instrumented and QEMU modes. We describe harness design, build instrumentation, seed and dictionary strategy, campaign metrics, crash triage, and attack-surface limitations. We also compare performance and coverage across fuzzing configurations, including persistent mode.
+We fuzz \texttt{libpng} 1.2.56 with AFL++ in three configurations:
+source-instrumented with ASan, AFL-instrumented without ASan, and QEMU
+mode against a vanilla \texttt{gcc} build. The decoder harness drives
+\texttt{png\_read\_info}, transforms, \texttt{png\_read\_image}, and
+\texttt{png\_read\_end} on ten small PNG seeds with the AFL++ PNG
+dictionary and a CRC-neutralised libpng. The 32-minute instrumented run
+reaches 966 of 3{,}122 edges (30.94\% bitmap) and saturates locally; a
+text-API harness reproduces a CVE-2016-10087-style heap-buffer-overflow
+in \texttt{png\_set\_text\_2}. We use the QEMU and persistent runs to
+discuss the limits of edge-count and bitmap comparisons across
+instrumentation sources.
 \end{abstract}
 
 \section{Setup and Methodology (Short Context)}
@@ -65,32 +74,131 @@ This report presents a coverage-guided fuzzing campaign of \texttt{libpng} using
 \end{itemize}
 \textbf{Your content.} % include concrete command lines or table
 
-\subsection{Q3 --- Seed Corpus and Dictionary (0--5 points)}
-\textbf{What to answer.}
-\begin{itemize}[leftmargin=*]
-  \item Describe seed selection strategy and why seeds are diverse/valid.
-  \item Describe dictionary tokens and what format elements they encode.
-  \item Quantify contributions from dictionary/havoc/splice using your AFL++ status numbers.
-  \item Explain dictionary entries in formal terms (grammar/language-theory perspective).
-\end{itemize}
-\textbf{Example angle from handout.}
-\begin{itemize}[leftmargin=*]
-  \item Tokens such as \texttt{IHDR}, \texttt{PLTE}, \texttt{IDAT}, \texttt{IEND} represent grammar terminals/chunk-type symbols that guide structured mutations.
-\end{itemize}
-\textbf{Your content.} % include exact numbers from your run
+\subsection{Q3 --- Seed Corpus and Dictionary}
+The campaign starts from ten small valid PNGs in \texttt{seeds/} (69--1388
+bytes, 3909 bytes in total). They cover RGB, RGBA, greyscale, greyscale+alpha,
+16-bit greyscale, indexed colour with \texttt{PLTE} and \texttt{tRNS}
+transparency, \texttt{iTXt} text metadata, Adam7 interlacing, and
+multi-\texttt{IDAT}/\texttt{hIST} cases. The point of keeping them small is
+that AFL++ calibrates and mutates each seed many times per second, so wasted
+bytes are wasted budget. The point of the diversity is that each seed already
+sits past the PNG signature and IHDR gate in a different state, so havoc
+mutation immediately exercises palette handling, ancillary chunks, zlib
+decompression, and scanline filters instead of having to first invent a valid
+container from random bytes.
 
-\subsection{Q4 --- Campaign Analysis (0--5 points)}
-\textbf{What to answer.}
-\begin{itemize}[leftmargin=*]
-  \item Report: stability, corpus count, map density, cycles done.
-  \item Include and interpret the edges-over-time curve (\texttt{afl-plot}).
-  \item Argue with evidence whether saturation was reached.
-\end{itemize}
-\textbf{Example angle from handout.}
-\begin{itemize}[leftmargin=*]
-  \item Early steep edge growth then plateau; reference concrete timestamps and metric values.
-\end{itemize}
-\textbf{Your content.} % 1 concise paragraph + pointers to appendix figures
+All reader campaigns add the AFL++ PNG dictionary with
+\texttt{-x /build/dictionaries/png.dict}. The Docker image copies it from the
+AFL++ distribution and the Makefile exposes it as \texttt{PNG\_DICT}. The
+useful entries are the PNG signature and the four-byte chunk type tokens
+(\texttt{IHDR}, \texttt{PLTE}, \texttt{IDAT}, \texttt{IEND}, \texttt{tRNS},
+\texttt{gAMA}, \texttt{tEXt}, and others). PNG is a binary grammar of the
+shape \(\mathit{File} \to \mathit{Signature}\ \mathit{Chunk}^{+}\) where each
+chunk is \texttt{length / type / data / CRC}. The dictionary gives AFL++ the
+terminal tokens for the signature and the type field; chunk ordering, lengths, 
+CRCs, filter bytes, and compressed IDAT payloads are all semantic structure the 
+mutator then discovers through coverage feedback.
+
+For the per-strategy yield numbers we needed AFL++'s live status rows, which
+the fuzzer does not write to \texttt{fuzzer\_stats} or \texttt{plot\_data}. We
+captured them from two short 300~s supplementary runs and preserved the
+transcripts and an extracted summary in \texttt{evidence/q3-live/}. The first
+run kept deterministic stages on (13{,}109 execs, 804 edges) so the
+dictionary row would actually fill in; the second used \texttt{-z -u} to skip
+deterministic stages and reach havoc/splice fast enough inside the 300~s
+budget (12{,}650 execs, 721 edges). These are evidence runs for Q3, not the
+canonical Q4 campaign.
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{lrrr}
+\toprule
+\textbf{Strategy} & \textbf{Finds} & \textbf{Attempts} & \textbf{Yield} \\
+\midrule
+Dictionary overwrite & 55 & 2{,}726 & 2.02\% \\
+Dictionary insert & 0 & 2{,}754 & 0.00\% \\
+Havoc & 61 & 6{,}500 & 0.94\% \\
+Splice & 4 & 420 & 0.95\% \\
+\bottomrule
+\end{tabular}
+\caption{AFL++ strategy yields from the live status captures.}
+\end{table}
+
+Dictionary \emph{overwrite} is the high-precision, low-volume operator: it
+replaces a few existing bytes with a known token, so a malformed four-byte
+chunk type can flip in one mutation to something the parser recognises and
+advance to the next validation or decompression stage. That is why it
+delivers the best yield (2.02\%). Dictionary \emph{insert} is the same
+operation without the alignment constraint, and on PNG it spends its budget
+breaking chunk lengths; in this run it found nothing in 2{,}754 attempts.
+Havoc is lower precision but higher volume: stacked random flips, overwrites,
+insertions, deletions, and size changes mostly break chunk alignment or
+compressed data, but 6{,}500 attempts give the mutator plenty of chances to
+land on a useful perturbation of dimensions, filter bytes, or payloads, which
+explains 61 finds at a 0.94\% yield. Splice has the highest variance because
+gluing two PNG inputs together usually leaves IHDR, PLTE, and IDAT
+inconsistent with each other, but a clean chunk-boundary recombination can
+still expose a new parser state -- 4 finds in 420 attempts is what that looks
+like in practice.
+
+\subsection{Q4 --- Campaign Analysis}
+The Q4 run we use is the ASan source-instrumented decoder campaign on the
+ten PNG seeds with the PNG dictionary, target \texttt{./png\_fuzz}. Its
+final \texttt{fuzzer\_stats} counters are:
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{lr}
+\toprule
+\textbf{Metric} & \textbf{Value} \\
+\midrule
+Executions / speed & 1{,}034{,}958 / 532.08 exec/s \\
+Corpus count & 715 files \\
+Cycles done & 5 \\
+Stability & 100.00\% \\
+Bitmap coverage & 30.94\% \\
+Edges found / total & 966 / 3{,}122 \\
+Crashes / hangs & 0 / 2 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Stability is 100\% and AFL++ recorded zero variable corpus entries, so the
+harness ran deterministically. That does not prove bug absence, but it does
+mean the two saved hangs are real timeout candidates worth triage rather than
+fuzzer noise. The queue grew from 10 seeds to 715 files (a 71.5$\times$
+expansion), and AFL++ only keeps mutations that add coverage, so that growth
+reflects the seed set crossing the signature, IHDR, palette, interlace, and
+ancillary-chunk gates and then expanding inside each of those regions.
+
+The \texttt{plot\_data} edge curve has the standard fast-rise, slow-tail
+shape: 735 edges at 61~s, 876 at 325~s, slowing from roughly 0.53 to
+0.067 edges/s between 325~s and the last find at 1{,}677~s (966 edges), then
+flat for 268~s to the end of the run. That tail is local saturation: AFL++
+has exhausted the easy-to-reach paths for \emph{this} harness, seed set,
+dictionary, CRC-neutralised build, and ASan fork-mode budget. It is not
+evidence that libpng has been fully explored. 966 reached edges out of
+3{,}122 instrumented edges is 30.94\%, so the majority of the instrumented
+explore space is still untouched. Most of what remains is gated by semantic
+constraints (specific chunk ordering, transform combinations, IDAT inflate
+states) and by API surfaces that are not called in the decoder harness.
+
+The longer parallel campaigns confirm rather than overturn this. Six
+persistent decoder workers ran for $\sim$21{,}593~s and summed to
+565{,}639{,}982 execs at 26{,}194 exec/s, reaching 1{,}088 / 3{,}131 edges
+(34.75\% bitmap); the main worker's last edge landed at 19{,}220~s and
+then stayed flat until 21{,}596~s. Its two saved crash files are
+low-confidence: standalone ASan replay did not reproduce either, and
+main-worker stability sat at 99.91\%, leaving room for fuzzer-environment
+non-determinism or cross-iteration state leak. Write-API: 35{,}705{,}101
+execs, 558 / 2{,}090 edges, last find at 194~s -- a narrow encoder-facing
+state space under our seeds. Metadata-API: 31{,}283{,}024 execs,
+458 / 3{,}388 edges (13.52\%), zero crashes or hangs -- negative evidence
+for that harness, not proof. For all three, \texttt{afl-plot} renders only
+the main worker; campaign-wide totals come from summing per-worker
+\texttt{fuzzer\_stats}.
 
 \subsection{Q5 --- Crash Triage (0--5 points)}
 \textbf{What to answer.}
@@ -118,94 +226,153 @@ This report presents a coverage-guided fuzzing campaign of \texttt{libpng} using
 \end{itemize}
 \textbf{Your content.}
 
-\subsection{Q7 --- Binary-Only Fuzzing with QEMU (0--5 points)}
-\textbf{What to answer.}
-\begin{itemize}[leftmargin=*]
-  \item Run the uninstrumented target with \texttt{afl-fuzz -Q}.
-  \item Compare instrumented vs QEMU at equal wall-clock time on:
-  \begin{itemize}[leftmargin=*]
-    \item exec speed,
-    \item edges discovered,
-    \item corpus count.
-  \end{itemize}
-  \item Explain why numbers differ using compile-time instrumentation vs runtime QEMU translation/coverage.
-\end{itemize}
-\textbf{Example angle from handout.}
-\begin{itemize}[leftmargin=*]
-  \item QEMU mode is slower due to dynamic translation/emulation overhead; still useful for binary-only targets.
-\end{itemize}
-\textbf{Your content.} % include side-by-side numeric mini-table
+\subsection{Q7 --- Binary-Only Fuzzing with QEMU}
+We ran the decoder twice on the same machine: the normal
+\texttt{afl-clang-fast} ASan build and an uninstrumented \texttt{gcc -g -O1}
+build launched with \texttt{afl-fuzz -Q}. Both used the same ten seeds, the
+same PNG dictionary, and the same CRC-neutralised libpng. Wall-clock times are
+close enough (1{,}945~s vs.\ 1{,}927~s) for a direct comparison; the
+canonical artefacts are \texttt{findings/default/} and
+\texttt{findings-qemu/default/} with matching \texttt{plot\_output*/}
+directories.
 
-\subsection{Q8 --- Instrumentation Depth and Performance (0--5 points)}
-\textbf{What to answer.}
-\begin{itemize}[leftmargin=*]
-  \item Report instrumented edge counts at startup for:
-  \begin{itemize}[leftmargin=*]
-    \item (a) library alone,
-    \item (b) final harness binary.
-  \end{itemize}
-  \item Explain count differences (linking scope/reachable code).
-  \item Compare map density against total instrumented edges and explain why many edges remain unreached.
-  \item Measure exec speed for:
-  \begin{itemize}[leftmargin=*]
-    \item no sanitizer + fork,
-    \item ASan + fork,
-    \item ASan + persistent mode.
-  \end{itemize}
-  \item Explain each slowdown/speedup source (sanitizer overhead, fork elimination).
-\end{itemize}
-\textbf{Example angle from handout.}
-\begin{itemize}[leftmargin=*]
-  \item Persistent mode (\texttt{AFL\_LOOP}) reduces process creation overhead and can significantly increase exec/sec.
-\end{itemize}
-\textbf{Your content.}
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{lrr}
+\toprule
+\textbf{Metric} & \textbf{Instrumented} & \textbf{QEMU} \\
+\midrule
+Runtime & 1{,}945~s & 1{,}927~s \\
+Executions & 1{,}034{,}958 & 1{,}111{,}274 \\
+Exec speed & 532.08/s & 576.56/s \\
+Corpus count & 715 & 801 \\
+Edges found / total & 966 / 3{,}122 & 2{,}730 / 65{,}536 \\
+Bitmap coverage & 30.94\% & 4.17\% \\
+Crashes / hangs & 0 / 2 & 0 / 0 \\
+\bottomrule
+\end{tabular}
+\caption{Same-time decoder campaign comparison.}
+\end{table}
+
+The results do not mean that QEMU covered more source code necessarily. The two rows count
+edges in different spaces. The instrumented build has AFL++ counters
+compiled into every basic block of the harness and libpng, so its
+3{,}122-edge denominator is the actual edge universe of that binary. QEMU
+mode runs the vanilla binary under user-mode translation (the
+\texttt{target\_mode} line in \texttt{fuzzer\_stats} reads
+\texttt{qemu shmem\_testcase}) and hashes translated control flow into
+AFL++'s fixed 64K-slot bitmap. So 2{,}730 QEMU edges and 4.17\% density are
+on a different scale than 966 compiler-instrumented edges and 30.94\%
+density; the QEMU number is bigger because the slot space is bigger, not
+because more code ran.
+
+Speed flipped in QEMU's favour for the same reason. Usually
+binary-translation slows things down, but our QEMU binary turns off
+ASan and AFL++ counters and the instrumented build is paying ASan's
+shadow-memory checks on every load and store. Dropping ASan from the
+instrumented build switches the ordering back again. The practical tradeoff
+is not really speed: QEMU mode lets us fuzz when we cannot recompile
+the target (real-world black-box fuzzing), but it gives up ASan's silent-corruption 
+detection. A heap-buffer-overflow that does not happen to land on an unmapped page
+will produce wrong pixels in QEMU mode and a clear stack trace in the
+instrumented run.
+
+
+\subsection{Q8 --- Instrumentation Depth and Performance}
+For instrumentation depth we ran short \texttt{afl-fuzz -V 5} probes against
+the ASan-free AFL-instrumented build. The ASan-free build is the right
+target here: ASan injects its own shadow-memory and check probes into the
+instrumented surface, so measuring depth on \texttt{png\_fuzz} would
+inflate \texttt{total\_edges} with sanitizer overhead rather than libpng's
+own control flow. The ``library alone'' row is a minimal binary that links
+\texttt{/build/install\_no\_asan/lib/libpng12.a} and only calls
+\texttt{png\_create\_read\_struct()} and
+\texttt{png\_destroy\_read\_struct()} -- a proxy for the linked libpng
+surface, not a real parser harness.
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{lrrr}
+\toprule
+\textbf{Binary} & \textbf{Reached} & \textbf{Total} & \textbf{Density} \\
+\midrule
+Minimal libpng probe & 49 & 3,090 & 1.59\% \\
+Final decoder harness & 638 & 3,130 & 20.38\% \\
+\bottomrule
+\end{tabular}
+\caption{Instrumented edge counts from \texttt{evidence/q8-edge-counts}.}
+\end{table}
+
+The total edge counts are close because both binaries link the same libpng
+archive, which is most of the instrumented code; the harness itself adds
+very little. The \emph{reached} counts diverge sharply because the probe
+only creates and destroys libpng state, while the harness actually feeds
+PNG bytes through \texttt{png\_read\_info()}, the transform setup, row
+allocation, \texttt{png\_read\_image()}, and \texttt{png\_read\_end()}.
+Even so, the harness only reaches 20.38\% of its 3{,}130 edges in this
+short run; the rest sit behind PNG validity constraints, rarer chunk
+orderings, Adam7 and transform combinations, IDAT/zlib inflate paths,
+error handlers, and libpng APIs that the decoder harness simply does not
+call.
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{lrrr}
+\toprule
+\textbf{Configuration} & \textbf{Exec/s} & \textbf{Edges} & \textbf{Mode} \\
+\midrule
+No sanitizer + fork & 73.61 & 645 / 3,130 & fork \\
+ASan + fork & 62.80 & 642 / 3,129 & fork \\
+ASan + persistent & 81.99 & 656 / 3,138 & persistent \\
+\bottomrule
+\end{tabular}
+\caption{\texttt{afl-fuzz -V 10} speed measurements with the same decoder logic.}
+\end{table}
+
+These are short startup-window measurements from \texttt{evidence/q8-speed},
+so the absolute exec/s numbers should not be over-read. The ordering still
+captures the real engineering tradeoff. The no-sanitizer fork build is still
+coverage-guided -- \texttt{afl-clang-fast} compiled the harness and libpng --
+but it skips ASan's shadow-memory checks, which is most of the per-execution
+cost. Turning ASan on in fork mode drops speed from 73.61 to 62.80 exec/s
+while preserving 100\% stability and essentially the same edge count.
+Persistent mode keeps ASan but loops in-process through
+\texttt{\_\_AFL\_LOOP(1000)}, which removes almost all the per-testcase
+process-startup cost; in this window that buys it back up to 81.99 exec/s,
+roughly a 30\% gain over ASan fork even with ASan still attached.
+The persistent-mode caveat is the one from Q4: when stability dips below
+100\%, saved crashes need standalone replay before you call them bugs.
 
 \section{Conclusion}
-% 1 short paragraph: what worked, what limits remained, key comparison takeaway.
+We exercised the libpng 1.2.56 decoder under AFL++ with three complementary
+configurations: a 32-minute instrumented ASan campaign for the canonical
+Q4/Q5/Q7 numbers, six-hour parallel campaigns for trend evidence, and a
+QEMU run for the binary-only comparison. The text-API harness produced a
+reproducible heap-buffer-overflow in \texttt{png\_set\_text\_2}; the decoder
+harness produced none, which the 30.94\% bitmap reading frames honestly --
+we covered the easy parts of the decoder under this seed and dictionary
+budget, not all of libpng. The most useful takeaway across Q7 and Q8 is
+that "more edges" only means "more code" when the edges come from the same
+instrumentation source: QEMU's 64K bitmap and ASan's shadow checks are
+features we trade against each other depending on what we are looking for.
 
 \appendix
-\section{Appendix: Evidence and Figures (Not Counted Toward 4-Page Limit)}
-\textbf{Checklist to include in appendix.}
-\begin{itemize}[leftmargin=*]
-  \item AFL++ status screenshot (instrumented campaign).
-  \item AFL++ status screenshot (QEMU campaign).
-  \item \texttt{afl-plot} edges graph (instrumented).
-  \item \texttt{afl-plot} edges graph (QEMU).
-  \item Crash triage screenshots/log excerpts (or synthetic bug validation evidence).
-  \item Optional: command/output snippets for edge counts and exec-speed measurements.
+\section{Appendix: Evidence Artifacts (Not Counted Toward 4-Page Limit)}
+The main report numbers above come from the following files:
+\begin{itemize}
+  \item Instrumented campaign:
+  \texttt{findings/default/fuzzer\_stats},
+  \texttt{findings/default/plot\_data},
+  \texttt{plot\_output/}.
+  \item QEMU campaign:
+  \texttt{findings-qemu/\allowbreak{}default/\allowbreak{}fuzzer\_stats},
+  \texttt{findings-qemu/\allowbreak{}default/\allowbreak{}plot\_data},
+  \texttt{plot\_output\_qemu/}.
+  \item Q8 edge counts: \texttt{evidence/q8-edge-counts/}.
+  \item Q8 speed measurements: \texttt{evidence/q8-speed/}.
 \end{itemize}
-
-\section{Appendix: Quick Fill-In Tables}
-\begin{table}[h]
-\centering
-\caption{Core campaign metrics (fill with your values).}
-\begin{tabular}{lcc}
-\toprule
-Metric & Instrumented & QEMU \\
-\midrule
-Duration (min) &  &  \\
-Exec speed (exec/s) &  &  \\
-Edges discovered &  &  \\
-Corpus count &  &  \\
-Stability (\%) &  &  \\
-Map density (\%) &  &  \\
-Cycles done &  &  \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\begin{table}[h]
-\centering
-\caption{Q8 performance configurations (same harness).}
-\begin{tabular}{lc}
-\toprule
-Configuration & Exec speed (exec/s) \\
-\midrule
-No sanitizer + fork mode &  \\
-ASan + fork mode &  \\
-ASan + persistent mode &  \\
-\bottomrule
-\end{tabular}
-\end{table}
 
 \end{document}
