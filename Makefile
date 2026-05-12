@@ -18,7 +18,7 @@ AFL_ENV ?= AFL_SKIP_CPUFREQ=1 ASAN_OPTIONS=abort_on_error=1:detect_leaks=0:symbo
 AFL_PARALLEL_ENV ?= AFL_NO_UI=1 $(AFL_ENV)
 PNG_DICT ?= /build/dictionaries/png.dict
 
-.PHONY: build build-no-asan build-qemu build-persistent build-progressive build-api build-write-api build-metadata-api fuzz fuzz-qemu fuzz-persistent fuzz-progressive fuzz-api fuzz-write-api fuzz-metadata-api fuzz-parallel fuzz-qemu-parallel fuzz-persistent-parallel fuzz-progressive-parallel fuzz-api-parallel fuzz-write-api-parallel fuzz-metadata-api-parallel clean
+.PHONY: build build-no-asan build-qemu build-persistent build-progressive build-api build-write-api build-metadata-api fuzz fuzz-no-asan fuzz-qemu fuzz-persistent fuzz-progressive fuzz-api fuzz-write-api fuzz-metadata-api fuzz-parallel fuzz-qemu-parallel fuzz-persistent-parallel fuzz-progressive-parallel fuzz-api-parallel fuzz-write-api-parallel fuzz-metadata-api-parallel q3-yields q8-edge-counts q8-speed clean
 
 build:
 	$(CC_INSTR) $(CFLAGS_INSTR) src/harness.c \
@@ -80,6 +80,10 @@ build-metadata-api:
 fuzz: build
 	mkdir -p findings
 	$(AFL_ENV) afl-fuzz -i seeds -o findings -x $(PNG_DICT) -- ./png_fuzz @@
+
+fuzz-no-asan: build-no-asan
+	mkdir -p findings-no-asan
+	$(AFL_ENV) afl-fuzz -i seeds -o findings-no-asan -x $(PNG_DICT) -- ./png_fuzz_no_asan @@
 
 fuzz-qemu: build-qemu
 	mkdir -p findings-qemu
@@ -168,6 +172,15 @@ fuzz-metadata-api-parallel: build-metadata-api
 	done; \
 	wait
 
+q3-yields:
+	python3 scripts/extract_q3_yields.py --output evidence/q3-yields/README.md
+
+q8-edge-counts:
+	python3 scripts/measure_q8_edges.py
+
+q8-speed:
+	python3 scripts/measure_q8_speed.py
+
 clean:
 	rm -f png_fuzz png_fuzz_no_asan png_fuzz_qemu png_fuzz_persistent png_fuzz_progressive png_fuzz_api png_fuzz_write_api png_fuzz_metadata_api
-	rm -rf findings findings-qemu findings-persistent findings-progressive findings-api findings-write-api findings-metadata-api
+	rm -rf findings findings-no-asan findings-qemu findings-persistent findings-progressive findings-api findings-write-api findings-metadata-api
