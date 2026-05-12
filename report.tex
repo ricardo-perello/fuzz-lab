@@ -270,29 +270,72 @@ will produce wrong pixels in QEMU mode and a clear stack trace in the
 instrumented run.
 
 
-\subsection{Q8 --- Instrumentation Depth and Performance (0--5 points)}
-\textbf{What to answer.}
-\begin{itemize}[leftmargin=*]
-  \item Report instrumented edge counts at startup for:
-  \begin{itemize}[leftmargin=*]
-    \item (a) library alone,
-    \item (b) final harness binary.
-  \end{itemize}
-  \item Explain count differences (linking scope/reachable code).
-  \item Compare map density against total instrumented edges and explain why many edges remain unreached.
-  \item Measure exec speed for:
-  \begin{itemize}[leftmargin=*]
-    \item no sanitizer + fork,
-    \item ASan + fork,
-    \item ASan + persistent mode.
-  \end{itemize}
-  \item Explain each slowdown/speedup source (sanitizer overhead, fork elimination).
-\end{itemize}
-\textbf{Example angle from handout.}
-\begin{itemize}[leftmargin=*]
-  \item Persistent mode (\texttt{AFL\_LOOP}) reduces process creation overhead and can significantly increase exec/sec.
-\end{itemize}
-\textbf{Your content.}
+\subsection{Q8 --- Instrumentation Depth and Performance}
+For instrumentation depth we ran short \texttt{afl-fuzz -V 5} probes against
+the ASan-free AFL-instrumented build. The ASan-free build is the right
+target here: ASan injects its own shadow-memory and check probes into the
+instrumented surface, so measuring depth on \texttt{png\_fuzz} would
+inflate \texttt{total\_edges} with sanitizer overhead rather than libpng's
+own control flow. The ``library alone'' row is a minimal binary that links
+\texttt{/build/install\_no\_asan/lib/libpng12.a} and only calls
+\texttt{png\_create\_read\_struct()} and
+\texttt{png\_destroy\_read\_struct()} -- a proxy for the linked libpng
+surface, not a real parser harness.
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{lrrr}
+\toprule
+\textbf{Binary} & \textbf{Reached} & \textbf{Total} & \textbf{Density} \\
+\midrule
+Minimal libpng probe & 49 & 3,090 & 1.59\% \\
+Final decoder harness & 638 & 3,130 & 20.38\% \\
+\bottomrule
+\end{tabular}
+\caption{Instrumented edge counts from \texttt{evidence/q8-edge-counts}.}
+\end{table}
+
+The total edge counts are close because both binaries link the same libpng
+archive, which is most of the instrumented code; the harness itself adds
+very little. The \emph{reached} counts diverge sharply because the probe
+only creates and destroys libpng state, while the harness actually feeds
+PNG bytes through \texttt{png\_read\_info()}, the transform setup, row
+allocation, \texttt{png\_read\_image()}, and \texttt{png\_read\_end()}.
+Even so, the harness only reaches 20.38\% of its 3{,}130 edges in this
+short run; the rest sit behind PNG validity constraints, rarer chunk
+orderings, Adam7 and transform combinations, IDAT/zlib inflate paths,
+error handlers, and libpng APIs that the decoder harness simply does not
+call.
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{lrrr}
+\toprule
+\textbf{Configuration} & \textbf{Exec/s} & \textbf{Edges} & \textbf{Mode} \\
+\midrule
+No sanitizer + fork & 73.61 & 645 / 3,130 & fork \\
+ASan + fork & 62.80 & 642 / 3,129 & fork \\
+ASan + persistent & 81.99 & 656 / 3,138 & persistent \\
+\bottomrule
+\end{tabular}
+\caption{\texttt{afl-fuzz -V 10} speed measurements with the same decoder logic.}
+\end{table}
+
+These are short startup-window measurements from \texttt{evidence/q8-speed},
+so the absolute exec/s numbers should not be over-read. The ordering still
+captures the real engineering tradeoff. The no-sanitizer fork build is still
+coverage-guided -- \texttt{afl-clang-fast} compiled the harness and libpng --
+but it skips ASan's shadow-memory checks, which is most of the per-execution
+cost. Turning ASan on in fork mode drops speed from 73.61 to 62.80 exec/s
+while preserving 100\% stability and essentially the same edge count.
+Persistent mode keeps ASan but loops in-process through
+\texttt{\_\_AFL\_LOOP(1000)}, which removes almost all the per-testcase
+process-startup cost; in this window that buys it back up to 81.99 exec/s,
+roughly a 30\% gain over ASan fork even with ASan still attached.
+The persistent-mode caveat is the one from Q4: when stability dips below
+100\%, saved crashes need standalone replay before you call them bugs.
 
 \section{Conclusion}
 % 1 short paragraph: what worked, what limits remained, key comparison takeaway.
