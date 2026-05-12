@@ -7,6 +7,8 @@
 \usepackage{enumitem}
 \usepackage{hyperref}
 
+\Urlmuskip=0mu plus 1mu
+
 \title{\Large CS-412 Software Security Fuzzing Lab\\Fuzzing \texttt{libpng} with AFL++}
 
 \author{
@@ -20,168 +22,109 @@ EPFL --- Spring 2026
 \maketitle
 
 \begin{abstract}
-% 4-6 lines max: target, setup, key result, and takeaway.
-This report presents a coverage-guided fuzzing campaign of \texttt{libpng} using AFL++ in both instrumented and QEMU modes. We describe harness design, build instrumentation, seed and dictionary strategy, campaign metrics, crash triage, and attack-surface limitations. We also compare performance and coverage across fuzzing configurations, including persistent mode.
+We fuzzed \texttt{libpng} 1.2.56 with AFL++ using source-instrumented, QEMU, and persistent-mode builds. Our main harness drives the read-side PNG pipeline from a mutated AFL++ input through chunk parsing, transforms, decompression, filtering, and row decoding. Additional API harnesses target text, metadata, palette, unknown-chunk, and write-side interfaces. The campaign rediscovered one reportable text-API memory-safety issue in the \texttt{png\_set\_text}/\texttt{png\_set\_text\_2} family; decoder hangs and non-reproducing harness artifacts are tracked separately until triage is complete.
 \end{abstract}
 
-\section{Setup and Methodology (Short Context)}
-% Keep this section brief; most grading is in Q1--Q8.
-\textbf{Target and version.} % e.g., libpng 1.2.56
+\section{Setup and Methodology}
+\textbf{Target and environment.}
+The target is \texttt{libpng} 1.2.56, built inside the provided Ubuntu 24.04 Docker environment. The image builds AFL++, downloads the \texttt{v1.2.56} libpng source, applies our CRC-neutralization patch, and installs three static library variants: AFL++ instrumentation with ASan, AFL++ instrumentation without ASan, and a vanilla \texttt{gcc} build for QEMU mode. The harnesses are in \texttt{src/}; the main decoder harness is \texttt{harness.c}, the persistent variant is \texttt{harness\_persistent.c}, and the focused API harnesses are \texttt{harness\_text\_api.c}, \texttt{harness\_write\_api.c}, and \texttt{harness\_metadata\_api.c}.
 
-\textbf{Environment.} % docker image, toolchain, key make targets
-
-\textbf{Campaign durations.} % instrumented >=30 min, qemu >=30 min
-
-\textbf{Artifacts reference.} % mention appendix figures/tables
+\textbf{Campaigns and artifacts.}
+The baseline decoder campaigns ran for approximately 32 minutes in source-instrumented ASan mode and QEMU mode. Longer supporting campaigns were also run for the persistent decoder and for the write, metadata, and text API harnesses; their compact evidence is kept under \texttt{triage-artifacts/}. Plots generated with \texttt{afl-plot}, minimized crash inputs, ASan traces, and final AFL++ status metrics are referenced in the appendix once the Person 1 and Person 2 evidence packets are finalized.
 
 \section{Evaluation Questions}
-\noindent\textit{Each subsection below corresponds to one graded question (0--5 points).}
+\noindent\textit{Each subsection corresponds to one graded question.}
 
-\subsection{Q1 --- Harness Design (0--5 points)}
-\textbf{What to answer.}
-\begin{itemize}[leftmargin=*]
-  \item Identify the chosen entry-point function(s) and justify why they are high-value fuzz targets.
-  \item Discuss alternatives considered (e.g., decoder vs encoder, high-level vs low-level API) and why you rejected/kept them.
-  \item Trace end-to-end data flow: AFL++ input file \(\rightarrow\) harness buffer/callback \(\rightarrow\) libpng APIs.
-  \item Explain every guard (error handling, dimension/resource limits, etc.) and why it helps fuzzing quality.
-\end{itemize}
-\textbf{Example angle from handout.}
-\begin{itemize}[leftmargin=*]
-  \item Decoder pipeline: \texttt{png\_set\_read\_fn()} + \texttt{png\_read\_info()} + \texttt{png\_read\_image()} to exercise chunk parsing, decompression, and filter logic.
-\end{itemize}
-\textbf{Your content.} % write 1-2 compact paragraphs
+\subsection{Q1 --- Harness Design}
+The primary fuzz target is the explicit read pipeline rather than a wrapper such as \texttt{png\_read\_png()}. AFL++ passes a testcase path through \texttt{@@}; the harness reads that file into an \texttt{InputState} buffer and gives libpng a custom \texttt{png\_set\_read\_fn()} callback. The callback copies exactly the number of bytes requested by libpng and raises \texttt{png\_error()} on out-of-input reads. This models a normal stream while keeping the testcase deterministic and avoiding interactive or OS-dependent behavior.
 
-\subsection{Q2 --- Instrumentation and Sanitizers (0--5 points)}
-\textbf{What to answer.}
-\begin{itemize}[leftmargin=*]
-  \item List all compiler/linker flags used for the instrumented build.
-  \item List all patches (notably CRC neutralization) and where they apply.
-  \item For each flag/patch: explain purpose and what breaks/degrades if omitted.
-\end{itemize}
-\textbf{Example angle from handout.}
-\begin{itemize}[leftmargin=*]
-  \item \texttt{-fsanitize=address} catches memory errors; without it, many bugs may not crash deterministically.
-  \item Disabling CRC checks in \texttt{png\_crc\_finish()} improves path discovery by letting mutated chunks reach deeper parsers.
-\end{itemize}
-\textbf{Your content.} % include concrete command lines or table
+After creating \texttt{png\_struct} and \texttt{png\_info}, the harness installs \texttt{setjmp(png\_jmpbuf(...))} so ordinary malformed PNGs return cleanly instead of terminating the fuzzer. It then executes \texttt{png\_read\_info()}, applies common transforms with \texttt{png\_set\_expand()}, \texttt{png\_set\_strip\_16()}, \texttt{png\_set\_gray\_to\_rgb()}, background handling, and gamma correction, calls \texttt{png\_read\_update\_info()}, allocates row buffers, reaches \texttt{png\_read\_image()}, and finishes with \texttt{png\_read\_end()}. This path covers signature checks, chunk parsing, zlib inflation, filtering, interlacing-related row logic, and color conversion decisions.
 
-\subsection{Q3 --- Seed Corpus and Dictionary (0--5 points)}
-\textbf{What to answer.}
-\begin{itemize}[leftmargin=*]
-  \item Describe seed selection strategy and why seeds are diverse/valid.
-  \item Describe dictionary tokens and what format elements they encode.
-  \item Quantify contributions from dictionary/havoc/splice using your AFL++ status numbers.
-  \item Explain dictionary entries in formal terms (grammar/language-theory perspective).
-\end{itemize}
-\textbf{Example angle from handout.}
-\begin{itemize}[leftmargin=*]
-  \item Tokens such as \texttt{IHDR}, \texttt{PLTE}, \texttt{IDAT}, \texttt{IEND} represent grammar terminals/chunk-type symbols that guide structured mutations.
-\end{itemize}
-\textbf{Your content.} % include exact numbers from your run
+The main resource guard rejects images wider or taller than 4096 pixels before row allocation. This does not try to validate PNG semantics; it only prevents AFL++ from spending time or memory on huge allocations that are unlikely to improve bug-finding. Cleanup is centralized so both success and libpng error paths free row buffers, destroy libpng state, close the file, and release the input buffer. The persistent harness preserves the same decoding logic but wraps it in \texttt{\_\_AFL\_LOOP(1000)} to measure forkserver overhead separately in Q8.
 
-\subsection{Q4 --- Campaign Analysis (0--5 points)}
-\textbf{What to answer.}
-\begin{itemize}[leftmargin=*]
-  \item Report: stability, corpus count, map density, cycles done.
-  \item Include and interpret the edges-over-time curve (\texttt{afl-plot}).
-  \item Argue with evidence whether saturation was reached.
-\end{itemize}
-\textbf{Example angle from handout.}
-\begin{itemize}[leftmargin=*]
-  \item Early steep edge growth then plateau; reference concrete timestamps and metric values.
-\end{itemize}
-\textbf{Your content.} % 1 concise paragraph + pointers to appendix figures
+We also added focused API harnesses because the full decoder does not naturally exercise all public setter paths. The text API harness directly targets \texttt{png\_set\_text()} twice, with fuzz-controlled keys, text pointers, compression mode, and optional \texttt{png\_free\_data()}; this is the harness that exposed the confirmed text finding. The metadata API harness drives setters for color, physical, profile, time, and unknown-chunk metadata. The write API harness creates synthetic image rows and exercises \texttt{png\_create\_write\_struct()}, output callbacks, row writing, filters, compression options, palette mode, bit-depth choices, and transform flags. These harnesses complement the decoder rather than replacing it.
 
-\subsection{Q5 --- Crash Triage (0--5 points)}
-\textbf{What to answer.}
-\begin{itemize}[leftmargin=*]
-  \item If crashes found: reproduce, minimize with \texttt{afl-tmin}, collect ASan trace, identify bug class and possible CVE.
-  \item If no crashes: inject synthetic bug, fuzz for 60s, show detection, then justify why no real bugs were found.
-\end{itemize}
-\textbf{Example angle from handout.}
-\begin{itemize}[leftmargin=*]
-  \item Workflow: reproduce \(\rightarrow\) minimize \(\rightarrow\) ASan diagnosis with command/output evidence.
-\end{itemize}
-\textbf{Your content.} % include command snippets and observed output summary
+\subsection{Q2 --- Instrumentation and Sanitizers}
+The source-instrumented build uses \texttt{afl-clang-fast} with \texttt{-fsanitize=address -g -O1}; the harness links statically against \texttt{/build/install/lib/libpng12.a} with \texttt{-fsanitize=address -lz -lm}. ASan turns heap overflows, use-after-free, and many invalid accesses into deterministic crashes that AFL++ can save. The runtime sets \texttt{ASAN\_OPTIONS} to abort on errors, disable leak detection, and skip inline symbolization; this makes sanitizer findings visible to AFL++, avoids leak noise in fuzzing loops, and leaves stack symbolization to triage.
 
-\subsection{Q6 --- Attack Surface Analysis (0--5 points)}
-\textbf{What to answer.}
-\begin{itemize}[leftmargin=*]
-  \item Name two real applications using libpng.
-  \item Describe one concrete attacker scenario involving untrusted PNG processing.
-  \item Identify at least two code paths in these applications not covered by your harness, with function/file references.
-  \item Explain security impact of those coverage gaps.
-\end{itemize}
-\textbf{Example angle from handout.}
-\begin{itemize}[leftmargin=*]
-  \item Compare app-level decoding pipelines versus isolated library harness: metadata handling, I/O wrappers, transformation configuration differences.
-\end{itemize}
-\textbf{Your content.}
+For QEMU mode, the target is rebuilt with \texttt{gcc -g -O1}, no sanitizer, and no AFL++ compile-time counters, then run with \texttt{afl-fuzz -Q}. This simulates a binary-only target and measures the cost of dynamic translation and runtime coverage collection. For Q8, a third library variant is built with \texttt{afl-clang-fast -g -O1} but without ASan, allowing a same-harness comparison of sanitizer overhead versus fork/persistent execution overhead.
 
-\subsection{Q7 --- Binary-Only Fuzzing with QEMU (0--5 points)}
-\textbf{What to answer.}
-\begin{itemize}[leftmargin=*]
-  \item Run the uninstrumented target with \texttt{afl-fuzz -Q}.
-  \item Compare instrumented vs QEMU at equal wall-clock time on:
-  \begin{itemize}[leftmargin=*]
-    \item exec speed,
-    \item edges discovered,
-    \item corpus count.
-  \end{itemize}
-  \item Explain why numbers differ using compile-time instrumentation vs runtime QEMU translation/coverage.
-\end{itemize}
-\textbf{Example angle from handout.}
-\begin{itemize}[leftmargin=*]
-  \item QEMU mode is slower due to dynamic translation/emulation overhead; still useful for binary-only targets.
-\end{itemize}
-\textbf{Your content.} % include side-by-side numeric mini-table
+The key source patch is \texttt{patches/libpng-1.2.56-no-crc.patch}, which changes \texttt{pngrutil.c}'s CRC check in \texttt{png\_crc\_finish()} to always report success. PNG chunks carry CRC-32 checksums; normal byte-level mutations almost immediately invalidate them. Without the patch, libpng rejects critical chunks early or discards mutated ancillary chunks, so AFL++ receives little feedback from deep parsers. With CRC neutralized, mutated chunk contents continue into chunk-specific code, decompression, transform setup, and metadata handling. The tradeoff is that the campaign no longer measures behavior behind strict CRC validation; for this lab that is acceptable because the objective is to reach security-relevant parsing code.
 
-\subsection{Q8 --- Instrumentation Depth and Performance (0--5 points)}
-\textbf{What to answer.}
-\begin{itemize}[leftmargin=*]
-  \item Report instrumented edge counts at startup for:
-  \begin{itemize}[leftmargin=*]
-    \item (a) library alone,
-    \item (b) final harness binary.
-  \end{itemize}
-  \item Explain count differences (linking scope/reachable code).
-  \item Compare map density against total instrumented edges and explain why many edges remain unreached.
-  \item Measure exec speed for:
-  \begin{itemize}[leftmargin=*]
-    \item no sanitizer + fork,
-    \item ASan + fork,
-    \item ASan + persistent mode.
-  \end{itemize}
-  \item Explain each slowdown/speedup source (sanitizer overhead, fork elimination).
-\end{itemize}
-\textbf{Example angle from handout.}
-\begin{itemize}[leftmargin=*]
-  \item Persistent mode (\texttt{AFL\_LOOP}) reduces process creation overhead and can significantly increase exec/sec.
-\end{itemize}
-\textbf{Your content.}
+\subsection{Q3 --- Seed Corpus and Dictionary}
+The decoder seed corpus intentionally uses small, valid PNGs with structural diversity rather than large photographs. The ten decoder seeds cover RGB, RGBA, grayscale with transparency, indexed color with PLTE, 16-bit grayscale, grayscale+alpha, ancillary text, an iTXt/CVE-oriented sample, Adam7 interlacing, and a multi-IDAT/hIST case. This gives AFL++ valid signatures, chunk ordering, dimensions, color modes, and metadata examples while keeping mutation cost low.
+
+The API harnesses use separate small textual seed corpora because their inputs are not PNG files; they are byte layouts interpreted by the harnesses as selectors, lengths, flags, strings, palette data, metadata values, and row-generation parameters. This keeps the fuzzer close to the public API state we want to test instead of requiring it to discover those states through a complete PNG file.
+
+For the decoder campaigns we pass the AFL++ PNG dictionary with \texttt{-x /build/dictionaries/png.dict}. In language terms, PNG files are not arbitrary byte strings; they follow a grammar consisting of the fixed PNG signature followed by chunks of the form length, type, data, CRC. Dictionary tokens such as the signature and chunk-type terminals \texttt{IHDR}, \texttt{PLTE}, \texttt{IDAT}, \texttt{IEND}, \texttt{tEXt}, \texttt{zTXt}, and \texttt{iTXt} bias AFL++ insertions and replacements toward syntactically meaningful regions of that grammar. The dictionary does not replace coverage guidance, but it increases the chance that havoc and splice mutations preserve or create recognizable chunk boundaries.
+
+% TODO(P2): Add concrete AFL++ yield evidence for dictionary/havoc/splice here.
+The final report should add the observed AFL++ mutation-yield numbers for dictionary, havoc, and splice once the campaign evidence owner extracts them from the final status screens or \texttt{fuzzer\_stats}. Those numbers should be interpreted as support for the seed/dictionary strategy, not as standalone proof of correctness.
+
+\subsection{Q4 --- Campaign Analysis}
+% TODO(P2): Replace this placeholder with final plot/status evidence.
+The campaign analysis will use the final \texttt{afl-plot} outputs and AFL++ status metrics for the selected runs. The minimum evidence to report is stability, corpus count, map density, cycles done, exec speed, and the edges-over-time curve for the source-instrumented decoder and QEMU decoder runs. The current evidence bundle already records a short ASan decoder baseline of about 32 minutes and a same-duration QEMU baseline; Person 2 will replace this paragraph with exact final numbers and a saturation argument.
+
+\subsection{Q5 --- Crash Triage}
+The reportable crash comes from the text API campaign, not from the baseline decoder. We selected one AFL++ crash from \texttt{findings-api-cve-212823/main/crashes/} and replayed it with the ASan text API harness using \texttt{./png\_fuzz\_api <input>}. The original reproducer was 39 bytes and exited with signal 6 under ASan. Running \texttt{afl-tmin} reduced it to the 3-byte input \texttt{00n} while preserving the crash, a 92.31\% size reduction.
+
+The minimized input produces an ASan null-page write in libpng. The top stack frames are \texttt{png\_set\_text\_2()} in \texttt{pngset.c}, called by \texttt{png\_set\_text()} at \texttt{pngset.c:654}, then by our \texttt{target\_text\_api()} at \texttt{harness\_text\_api.c:112}. This matches the CVE-2016-10087-style bug class: libpng versions through 1.2.56 have a null-pointer dereference in \texttt{png\_set\_text\_2()} when an application adds, removes, and re-adds text chunks.\footnote{\url{https://www.libpng.org/pub/png/libpng.html}} Our harness exercises exactly that state sequence: it calls \texttt{png\_set\_text()}, optionally frees \texttt{PNG\_FREE\_TEXT}, then calls \texttt{png\_set\_text()} again with fuzz-controlled text fields.
+
+For deduplication, we replayed all 90 saved text API crash files against the same ASan harness. Of these, 59 reproduced as the same \texttt{png\_set\_text\_2} ASan SEGV and 31 exited cleanly in standalone replay, so we count one confirmed root cause and treat the clean standalone replays as non-reproducing AFL artifacts. Decoder hangs remain pending because they still need timeout reproduction, minimization, and root-cause analysis. The persistent decoder's two saved crashes are excluded unless they can be reproduced as standalone ASan faults, and the early metadata API crashes are excluded because they were caused by a harness allocation bug and the clean rerun produced zero crashes.
+
+\subsection{Q6 --- Attack Surface Analysis}
+Two realistic consumers of libpng are Firefox and ImageMagick. Firefox's PNG decoder lives in \texttt{image/decoders/nsPNGDecoder.cpp}: it includes \texttt{png.h}, creates libpng read state, configures unknown chunks and limits, and uses progressive callbacks through \texttt{png\_set\_progressive\_read\_fn()}.\footnote{\url{https://searchfox.org/firefox-main/source/image/decoders/nsPNGDecoder.cpp}} ImageMagick's PNG coder lives in \texttt{coders/png.c}: it contains read and write entry points such as \texttt{ReadPNGImage()}, \texttt{ReadOnePNGImage()}, and \texttt{WritePNGImage()}, and calls libpng through application-specific blob I/O, options, profile handling, and MNG/JNG support.\footnote{\url{https://github.com/ImageMagick/ImageMagick/blob/main/coders/png.c}}
+
+In a browser scenario, an attacker can place a malicious PNG in a web page, favicon, CSS image, downloaded attachment preview, or image cache path. The exposed surface is not only libpng's core chunk parser; it is the complete browser image pipeline around progressive network input, metadata decode, color management, frame allocation, and surface output. A memory corruption in that path could at minimum crash the content process and, depending on sandboxing and exploitability, become part of a renderer compromise chain. In an ImageMagick scenario, a server may call \texttt{identify}, \texttt{convert}, or a library binding on user-uploaded images to generate thumbnails or metadata. A crafted PNG can then reach a long-running backend process, where denial of service is already relevant and memory corruption can be more serious if the service has access to stored media or internal files.
+
+Our harnesses cover important libpng behavior, but they are not full application harnesses. First, Firefox uses progressive decoding: \texttt{nsPNGDecoder::InitInternal()} installs \texttt{info\_callback}, \texttt{row\_callback}, and \texttt{end\_callback}, while \texttt{ReadPNGData()} feeds chunks incrementally and handles libpng \texttt{setjmp} errors. Our decoder harness instead calls the sequential \texttt{png\_read\_info()} / \texttt{png\_read\_image()} API on a complete in-memory input. This misses browser-specific streaming states, pause/resume transitions, and callback ordering. Firefox also parses PNG eXIf data with \texttt{EXIFParser::Parse()}, uses qcms color transforms, and has APNG frame paths such as \texttt{frame\_info\_callback()}; none of those application-level paths are exercised by our standalone decoder.
+
+Second, ImageMagick wraps libpng with substantial logic that our harnesses do not model. \texttt{ReadOnePNGImage()} handles ImageMagick blob I/O, resource limits, raw profile extraction from text chunks via \texttt{Magick\_png\_read\_raw\_profile()}, user options such as CRC handling and ICC-profile preservation, and conversion into ImageMagick's pixel cache. \texttt{ReadMNGImage()} and \texttt{ReadOneJNGImage()} add multi-image and JPEG-in-PNG-family formats that are outside our PNG-only decoder. Even though our write API harness calls libpng's write-side functions, it does not cover ImageMagick's \texttt{WritePNGImage()} path, where input comes from ImageMagick image objects, quantization/depth-reduction choices, profiles, and format-specific command options. These gaps matter because application glue often creates the exact state combinations, allocators, and lifetime patterns that isolated library harnesses intentionally simplify away.
+
+\subsection{Q7 --- Binary-Only Fuzzing with QEMU}
+% TODO(P2): Add equal-wall-clock ASan fork vs QEMU table and QEMU-long note.
+The QEMU comparison should use the roughly equal 32-minute ASan fork and QEMU short decoder runs as the clean side-by-side experiment. The longer QEMU run lasted about 3 hours 39 minutes and should be mentioned only as supporting evidence, not as a clean 6-hour comparison. The explanation should distinguish compile-time AFL++ edge counters from QEMU's dynamic translation and runtime coverage collection, and should compare exec speed, edges discovered, and corpus size.
+
+\subsection{Q8 --- Instrumentation Depth and Performance}
+% TODO(P2): Add edge-count measurements and same-machine three-way speed table.
+The final Q8 section should report instrumented edge counts for libpng alone and for the final harness binary, then compare no-sanitizer fork mode, ASan fork mode, and ASan persistent mode on the same machine and seed corpus. The expected interpretation is that ASan slows each execution by adding memory checks and redzones, while persistent mode removes much of the process creation overhead by reusing one initialized process across many AFL++ iterations.
 
 \section{Conclusion}
-% 1 short paragraph: what worked, what limits remained, key comparison takeaway.
+The harness design reached the intended libpng decoder surface and the focused API harnesses expanded coverage beyond file parsing into public setter and writer APIs. The strongest confirmed result so far is the text API finding; the main remaining work is evidence polish: final plots and speed measurements, a minimized ASan trace, and a careful distinction between confirmed bugs, pending hangs, and excluded harness artifacts.
 
 \appendix
-\section{Appendix: Evidence and Figures (Not Counted Toward 4-Page Limit)}
-\textbf{Checklist to include in appendix.}
+\section{Appendix: Evidence and Figures}
+\begin{figure}[h]
+\centering
+\includegraphics[width=\linewidth]{plot_output/edges.png}
+\caption{Baseline source-instrumented decoder edges over time. Replace or keep after Person 2 finalizes the selected plot set.}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\linewidth]{plot_output_qemu/edges.png}
+\caption{Baseline QEMU decoder edges over time. Replace or keep after Person 2 finalizes the selected plot set.}
+\end{figure}
+
+\textbf{Evidence checklist.}
 \begin{itemize}[leftmargin=*]
-  \item AFL++ status screenshot (instrumented campaign).
-  \item AFL++ status screenshot (QEMU campaign).
-  \item \texttt{afl-plot} edges graph (instrumented).
-  \item \texttt{afl-plot} edges graph (QEMU).
-  \item Crash triage screenshots/log excerpts (or synthetic bug validation evidence).
-  \item Optional: command/output snippets for edge counts and exec-speed measurements.
+  \item AFL++ status evidence for source-instrumented decoder, QEMU decoder, persistent decoder, write API, and metadata API campaigns.
+  \item \texttt{afl-plot} outputs for the final selected campaigns.
+  \item Q3 dictionary/havoc/splice yield evidence.
+  \item Q5 minimized text API reproducer and final ASan trace.
+  \item Q5 deduplication table for the 90 text API crashes.
+  \item Q5 pending/excluded list for decoder hangs, non-reproducing persistent crashes, and metadata harness bugs.
+  \item Q7 equal-wall-clock ASan fork vs QEMU comparison table.
+  \item Q8 edge-count and three-way speed measurements.
 \end{itemize}
 
-\section{Appendix: Quick Fill-In Tables}
+\section{Appendix: Fill-In Tables}
 \begin{table}[h]
 \centering
-\caption{Core campaign metrics (fill with your values).}
+\caption{Core campaign metrics.}
 \begin{tabular}{lcc}
 \toprule
-Metric & Instrumented & QEMU \\
+Metric & ASan fork & QEMU short \\
 \midrule
 Duration (min) &  &  \\
 Exec speed (exec/s) &  &  \\
@@ -196,7 +139,7 @@ Cycles done &  &  \\
 
 \begin{table}[h]
 \centering
-\caption{Q8 performance configurations (same harness).}
+\caption{Q8 performance configurations.}
 \begin{tabular}{lc}
 \toprule
 Configuration & Exec speed (exec/s) \\
@@ -204,6 +147,25 @@ Configuration & Exec speed (exec/s) \\
 No sanitizer + fork mode &  \\
 ASan + fork mode &  \\
 ASan + persistent mode &  \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[h]
+\centering
+\caption{Q5 finding status.}
+\small
+\begin{tabular}{p{0.38\linewidth}p{0.14\linewidth}p{0.33\linewidth}}
+\toprule
+Category & Count & Status \\
+\midrule
+Text API crashes & 90 & Dedup pending \\
+Reproducing text crashes & 59 & \texttt{png\_set\_text\_2} SEGV \\
+Confirmed text root cause & 1 & Minimized/ASan traced \\
+Non-reproducing text crashes & 31 & Clean standalone replay \\
+Decoder hangs & 9 & Pending replay \\
+Persistent crashes & 2 & Excluded if non-repro \\
+Metadata early crashes &  & Excluded harness bug \\
 \bottomrule
 \end{tabular}
 \end{table}
