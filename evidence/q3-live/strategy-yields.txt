@@ -1,0 +1,78 @@
+Q3 AFL++ live strategy-yield evidence
+====================================
+
+Purpose
+-------
+This file preserves the exact AFL++ UI strategy-yield rows captured from fresh
+supplementary Q3 runs. AFL++ does not natively write these rows into
+fuzzer_stats or plot_data; those files are preserved beside the transcripts as
+supporting campaign context.
+
+Run 1: dictionary-row capture
+-----------------------------
+Source transcript: evidence/q3-live/afl-ui.typescript
+Supporting stats: evidence/q3-live/findings/default/fuzzer_stats
+AFL++ version: ++4.41a
+Command:
+  afl-fuzz -V 300 -u -i seeds -o evidence/q3-live/findings -x /build/dictionaries/png.dict -- ./png_fuzz @@
+
+Context from fuzzer_stats:
+  run_time: 300
+  execs_done: 13109
+  execs_per_sec: 43.69
+  corpus_count: 130
+  edges_found: 804
+  bitmap_cvg: 25.74%
+  stability: 100.00%
+  saved_crashes: 0
+  saved_hangs: 0
+
+Exact final AFL++ UI rows from transcript:
+  dictionary   : 55/2726, 0/2754, 0/0, 0/0
+  havoc/splice : 0/0, 0/0
+
+Interpretation:
+  This run kept deterministic stages enabled and used the PNG dictionary with
+  -x /build/dictionaries/png.dict. It reached and exercised the user-dictionary
+  stages, producing 55 finds from 2726 user-dictionary overwrite attempts and
+  0 finds from 2754 user-dictionary insert attempts. It did not complete enough
+  havoc/splice work before the 300-second limit, so its havoc/splice row is not
+  used as the final havoc/splice evidence.
+
+Run 2: havoc/splice-row capture
+-------------------------------
+Source transcript: evidence/q3-live/afl-ui-havoc-splice.typescript
+Supporting stats: evidence/q3-live/findings-havoc-splice/default/fuzzer_stats
+AFL++ version: ++4.41a
+Command:
+  afl-fuzz -V 300 -z -u -i seeds -o evidence/q3-live/findings-havoc-splice -x /build/dictionaries/png.dict -- ./png_fuzz @@
+
+Context from fuzzer_stats:
+  run_time: 300
+  execs_done: 12650
+  execs_per_sec: 42.16
+  corpus_count: 111
+  edges_found: 721
+  bitmap_cvg: 23.08%
+  stability: 100.00%
+  saved_crashes: 0
+  saved_hangs: 0
+  total_tmout: 2
+
+Exact final AFL++ UI rows from transcript:
+  dictionary   : havoc mode
+  havoc/splice : 61/6500, 4/420
+
+Interpretation:
+  This run used -z to skip deterministic stages and -u to enable testcase
+  splicing, so it reached havoc/splice quickly enough for a fixed 300-second
+  evidence run. The UI row records 61 finds from 6500 havoc attempts and
+  4 finds from 420 splice attempts. The dictionary row says "havoc mode"
+  because deterministic dictionary stages were intentionally disabled in this
+  second run; use Run 1 for the dictionary-specific row.
+
+Report-use note
+---------------
+Use these as supplementary Q3 evidence, not as replacements for the canonical
+30-minute Q4/Q7 campaign metrics. Cite fuzzer_stats and plot_data only for run
+context; cite the transcripts and this file for the strategy-yield rows.
