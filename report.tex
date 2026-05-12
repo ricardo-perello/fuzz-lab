@@ -133,18 +133,63 @@ inconsistent with each other, but a clean chunk-boundary recombination can
 still expose a new parser state -- 4 finds in 420 attempts is what that looks
 like in practice.
 
-\subsection{Q4 --- Campaign Analysis (0--5 points)}
-\textbf{What to answer.}
-\begin{itemize}[leftmargin=*]
-  \item Report: stability, corpus count, map density, cycles done.
-  \item Include and interpret the edges-over-time curve (\texttt{afl-plot}).
-  \item Argue with evidence whether saturation was reached.
-\end{itemize}
-\textbf{Example angle from handout.}
-\begin{itemize}[leftmargin=*]
-  \item Early steep edge growth then plateau; reference concrete timestamps and metric values.
-\end{itemize}
-\textbf{Your content.} % 1 concise paragraph + pointers to appendix figures
+\subsection{Q4 --- Campaign Analysis}
+The Q4 run we use is the ASan source-instrumented decoder campaign on the
+ten PNG seeds with the PNG dictionary, target \texttt{./png\_fuzz}. Its
+final \texttt{fuzzer\_stats} counters are:
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{lr}
+\toprule
+\textbf{Metric} & \textbf{Value} \\
+\midrule
+Executions / speed & 1{,}034{,}958 / 532.08 exec/s \\
+Corpus count & 715 files \\
+Cycles done & 5 \\
+Stability & 100.00\% \\
+Bitmap coverage & 30.94\% \\
+Edges found / total & 966 / 3{,}122 \\
+Crashes / hangs & 0 / 2 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Stability is 100\% and AFL++ recorded zero variable corpus entries, so the
+harness ran deterministically. That does not prove bug absence, but it does
+mean the two saved hangs are real timeout candidates worth triage rather than
+fuzzer noise. The queue grew from 10 seeds to 715 files (a 71.5$\times$
+expansion), and AFL++ only keeps mutations that add coverage, so that growth
+reflects the seed set crossing the signature, IHDR, palette, interlace, and
+ancillary-chunk gates and then expanding inside each of those regions.
+
+The \texttt{plot\_data} edge curve has the standard fast-rise, slow-tail
+shape: 735 edges at 61~s, 876 at 325~s, slowing from roughly 0.53 to
+0.067 edges/s between 325~s and the last find at 1{,}677~s (966 edges), then
+flat for 268~s to the end of the run. That tail is local saturation: AFL++
+has exhausted the easy-to-reach paths for \emph{this} harness, seed set,
+dictionary, CRC-neutralised build, and ASan fork-mode budget. It is not
+evidence that libpng has been fully explored. 966 reached edges out of
+3{,}122 instrumented edges is 30.94\%, so the majority of the instrumented
+explore space is still untouched. Most of what remains is gated by semantic
+constraints (specific chunk ordering, transform combinations, IDAT inflate
+states) and by API surfaces that are not called in the decoder harness.
+
+The longer parallel campaigns confirm rather than overturn this. Six
+persistent decoder workers ran for $\sim$21{,}593~s and summed to
+565{,}639{,}982 execs at 26{,}194 exec/s, reaching 1{,}088 / 3{,}131 edges
+(34.75\% bitmap); the main worker's last edge landed at 19{,}220~s and
+then stayed flat until 21{,}596~s. Its two saved crash files are
+low-confidence: standalone ASan replay did not reproduce either, and
+main-worker stability sat at 99.91\%, leaving room for fuzzer-environment
+non-determinism or cross-iteration state leak. Write-API: 35{,}705{,}101
+execs, 558 / 2{,}090 edges, last find at 194~s -- a narrow encoder-facing
+state space under our seeds. Metadata-API: 31{,}283{,}024 execs,
+458 / 3{,}388 edges (13.52\%), zero crashes or hangs -- negative evidence
+for that harness, not proof. For all three, \texttt{afl-plot} renders only
+the main worker; campaign-wide totals come from summing per-worker
+\texttt{fuzzer\_stats}.
 
 \subsection{Q5 --- Crash Triage (0--5 points)}
 \textbf{What to answer.}
