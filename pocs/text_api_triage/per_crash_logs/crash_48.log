@@ -1,0 +1,16 @@
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+==155==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000000 (pc 0xaaaae63d06c4 bp 0xffffc0db4720 sp 0xffffc0db46f0 T0)
+==155==The signal is caused by a WRITE memory access.
+==155==Hint: address points to the zero page.
+    #0 0xaaaae63d06c4 in png_set_text_2 /build/libpng-instrumented/pngset.c
+    #1 0xaaaae63d0348 in png_set_text /build/libpng-instrumented/pngset.c:654:10
+    #2 0xaaaae63c7c28 in target_text_api /work/src/harness_text_api.c:112:5
+    #3 0xaaaae63c711c in main /work/src/harness_text_api.c:224:17
+    #4 0xffffbd0584c0  (/lib/aarch64-linux-gnu/libc.so.6+0x284c0) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #5 0xffffbd058594 in __libc_start_main (/lib/aarch64-linux-gnu/libc.so.6+0x28594) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #6 0xaaaae62ea76c in _start (/work/png_fuzz_api+0x3a76c) (BuildId: 21d8426ee6b9a463676b7110d0ac10be1fa04185)
+
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /build/libpng-instrumented/pngset.c in png_set_text_2
+==155==ABORTING

@@ -1,0 +1,1124 @@
+=== triage-artifacts/local/findings-api-cve-212823/main/crashes/id:000000,sig:11,src:000000,time:979,execs:331,op:havoc,rep:3 ===
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+==14==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000000 (pc 0xaaaab66c06c4 bp 0xffffc7d0c6e0 sp 0xffffc7d0c6b0 T0)
+==14==The signal is caused by a WRITE memory access.
+==14==Hint: address points to the zero page.
+    #0 0xaaaab66c06c4 in png_set_text_2 /build/libpng-instrumented/pngset.c
+    #1 0xaaaab66c0348 in png_set_text /build/libpng-instrumented/pngset.c:654:10
+    #2 0xaaaab66b7c28 in target_text_api /work/src/harness_text_api.c:112:5
+    #3 0xaaaab66b711c in main /work/src/harness_text_api.c:224:17
+    #4 0xffff95f784c0  (/lib/aarch64-linux-gnu/libc.so.6+0x284c0) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #5 0xffff95f78594 in __libc_start_main (/lib/aarch64-linux-gnu/libc.so.6+0x28594) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #6 0xaaaab65da76c in _start (/work/png_fuzz_api+0x3a76c) (BuildId: 21d8426ee6b9a463676b7110d0ac10be1fa04185)
+
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /build/libpng-instrumented/pngset.c in png_set_text_2
+==14==ABORTING
+exit=134
+=== triage-artifacts/local/findings-api-cve-212823/main/crashes/id:000001,sig:11,src:000000,time:2037,execs:680,op:havoc,rep:3 ===
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+==19==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000000 (pc 0xaaaab81f06c4 bp 0xffffdcf25ac0 sp 0xffffdcf25a90 T0)
+==19==The signal is caused by a WRITE memory access.
+==19==Hint: address points to the zero page.
+    #0 0xaaaab81f06c4 in png_set_text_2 /build/libpng-instrumented/pngset.c
+    #1 0xaaaab81f0348 in png_set_text /build/libpng-instrumented/pngset.c:654:10
+    #2 0xaaaab81e7c28 in target_text_api /work/src/harness_text_api.c:112:5
+    #3 0xaaaab81e711c in main /work/src/harness_text_api.c:224:17
+    #4 0xffffb86b84c0  (/lib/aarch64-linux-gnu/libc.so.6+0x284c0) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #5 0xffffb86b8594 in __libc_start_main (/lib/aarch64-linux-gnu/libc.so.6+0x28594) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #6 0xaaaab810a76c in _start (/work/png_fuzz_api+0x3a76c) (BuildId: 21d8426ee6b9a463676b7110d0ac10be1fa04185)
+
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /build/libpng-instrumented/pngset.c in png_set_text_2
+==19==ABORTING
+exit=134
+=== triage-artifacts/local/findings-api-cve-212823/main/crashes/id:000002,sig:06,src:000000,time:2273,execs:760,op:havoc,rep:3 ===
+exit=0
+=== triage-artifacts/local/findings-api-cve-212823/main/crashes/id:000003,sig:11,src:000000,time:3657,execs:1232,op:havoc,rep:4 ===
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+==28==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000000 (pc 0xaaaacf5906c4 bp 0xffffd41d7560 sp 0xffffd41d7530 T0)
+==28==The signal is caused by a WRITE memory access.
+==28==Hint: address points to the zero page.
+    #0 0xaaaacf5906c4 in png_set_text_2 /build/libpng-instrumented/pngset.c
+    #1 0xaaaacf590348 in png_set_text /build/libpng-instrumented/pngset.c:654:10
+    #2 0xaaaacf587c28 in target_text_api /work/src/harness_text_api.c:112:5
+    #3 0xaaaacf58711c in main /work/src/harness_text_api.c:224:17
+    #4 0xffffb13184c0  (/lib/aarch64-linux-gnu/libc.so.6+0x284c0) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #5 0xffffb1318594 in __libc_start_main (/lib/aarch64-linux-gnu/libc.so.6+0x28594) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #6 0xaaaacf4aa76c in _start (/work/png_fuzz_api+0x3a76c) (BuildId: 21d8426ee6b9a463676b7110d0ac10be1fa04185)
+
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /build/libpng-instrumented/pngset.c in png_set_text_2
+==28==ABORTING
+exit=134
+=== triage-artifacts/local/findings-api-cve-212823/main/crashes/id:000004,sig:11,src:000000,time:4955,execs:1674,op:havoc,rep:4 ===
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+==33==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000000 (pc 0xaaaae64d06c4 bp 0xffffdaa85fe0 sp 0xffffdaa85fb0 T0)
+==33==The signal is caused by a WRITE memory access.
+==33==Hint: address points to the zero page.
+    #0 0xaaaae64d06c4 in png_set_text_2 /build/libpng-instrumented/pngset.c
+    #1 0xaaaae64d0348 in png_set_text /build/libpng-instrumented/pngset.c:654:10
+    #2 0xaaaae64c7c28 in target_text_api /work/src/harness_text_api.c:112:5
+    #3 0xaaaae64c711c in main /work/src/harness_text_api.c:224:17
+    #4 0xffff86c584c0  (/lib/aarch64-linux-gnu/libc.so.6+0x284c0) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #5 0xffff86c58594 in __libc_start_main (/lib/aarch64-linux-gnu/libc.so.6+0x28594) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #6 0xaaaae63ea76c in _start (/work/png_fuzz_api+0x3a76c) (BuildId: 21d8426ee6b9a463676b7110d0ac10be1fa04185)
+
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /build/libpng-instrumented/pngset.c in png_set_text_2
+==33==ABORTING
+exit=134
+=== triage-artifacts/local/findings-api-cve-212823/main/crashes/id:000005,sig:11,src:000000,time:5062,execs:1708,op:havoc,rep:4 ===
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+==38==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000000 (pc 0xaaaab95d06c4 bp 0xffffdd4cd780 sp 0xffffdd4cd750 T0)
+==38==The signal is caused by a WRITE memory access.
+==38==Hint: address points to the zero page.
+    #0 0xaaaab95d06c4 in png_set_text_2 /build/libpng-instrumented/pngset.c
+    #1 0xaaaab95d0348 in png_set_text /build/libpng-instrumented/pngset.c:654:10
+    #2 0xaaaab95c7c28 in target_text_api /work/src/harness_text_api.c:112:5
+    #3 0xaaaab95c711c in main /work/src/harness_text_api.c:224:17
+    #4 0xffffb1c584c0  (/lib/aarch64-linux-gnu/libc.so.6+0x284c0) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #5 0xffffb1c58594 in __libc_start_main (/lib/aarch64-linux-gnu/libc.so.6+0x28594) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #6 0xaaaab94ea76c in _start (/work/png_fuzz_api+0x3a76c) (BuildId: 21d8426ee6b9a463676b7110d0ac10be1fa04185)
+
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /build/libpng-instrumented/pngset.c in png_set_text_2
+==38==ABORTING
+exit=134
+=== triage-artifacts/local/findings-api-cve-212823/main/crashes/id:000006,sig:06,src:000000,time:13126,execs:4414,op:havoc,rep:4 ===
+exit=0
+=== triage-artifacts/local/findings-api-cve-212823/main/crashes/id:000007,sig:06,src:000012,time:41167,execs:13838,op:havoc,rep:15 ===
+exit=0
+=== triage-artifacts/local/findings-api-cve-212823/main/crashes/id:000008,sig:11,src:000035,time:76900,execs:25591,op:havoc,rep:57 ===
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+==51==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000000 (pc 0xaaaadeb706c4 bp 0xfffffca03e00 sp 0xfffffca03dd0 T0)
+==51==The signal is caused by a WRITE memory access.
+==51==Hint: address points to the zero page.
+    #0 0xaaaadeb706c4 in png_set_text_2 /build/libpng-instrumented/pngset.c
+    #1 0xaaaadeb70348 in png_set_text /build/libpng-instrumented/pngset.c:654:10
+    #2 0xaaaadeb67c28 in target_text_api /work/src/harness_text_api.c:112:5
+    #3 0xaaaadeb6711c in main /work/src/harness_text_api.c:224:17
+    #4 0xffffb98c84c0  (/lib/aarch64-linux-gnu/libc.so.6+0x284c0) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #5 0xffffb98c8594 in __libc_start_main (/lib/aarch64-linux-gnu/libc.so.6+0x28594) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #6 0xaaaadea8a76c in _start (/work/png_fuzz_api+0x3a76c) (BuildId: 21d8426ee6b9a463676b7110d0ac10be1fa04185)
+
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /build/libpng-instrumented/pngset.c in png_set_text_2
+==51==ABORTING
+exit=134
+=== triage-artifacts/local/findings-api-cve-212823/main/crashes/id:000009,sig:11,src:000035,time:77436,execs:25772,op:havoc,rep:51 ===
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+==56==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000000 (pc 0xaaaabdc806c4 bp 0xffffc251d660 sp 0xffffc251d630 T0)
+==56==The signal is caused by a WRITE memory access.
+==56==Hint: address points to the zero page.
+    #0 0xaaaabdc806c4 in png_set_text_2 /build/libpng-instrumented/pngset.c
+    #1 0xaaaabdc80348 in png_set_text /build/libpng-instrumented/pngset.c:654:10
+    #2 0xaaaabdc77c28 in target_text_api /work/src/harness_text_api.c:112:5
+    #3 0xaaaabdc7711c in main /work/src/harness_text_api.c:224:17
+    #4 0xffff88e584c0  (/lib/aarch64-linux-gnu/libc.so.6+0x284c0) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #5 0xffff88e58594 in __libc_start_main (/lib/aarch64-linux-gnu/libc.so.6+0x28594) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #6 0xaaaabdb9a76c in _start (/work/png_fuzz_api+0x3a76c) (BuildId: 21d8426ee6b9a463676b7110d0ac10be1fa04185)
+
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /build/libpng-instrumented/pngset.c in png_set_text_2
+==56==ABORTING
+exit=134
+=== triage-artifacts/local/findings-api-cve-212823/main/crashes/id:000010,sig:11,src:000035,time:77895,execs:25929,op:havoc,rep:42 ===
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+==61==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000000 (pc 0xaaaad93906c4 bp 0xfffffbf3ad00 sp 0xfffffbf3acd0 T0)
+==61==The signal is caused by a WRITE memory access.
+==61==Hint: address points to the zero page.
+    #0 0xaaaad93906c4 in png_set_text_2 /build/libpng-instrumented/pngset.c
+    #1 0xaaaad9390348 in png_set_text /build/libpng-instrumented/pngset.c:654:10
+    #2 0xaaaad9387c28 in target_text_api /work/src/harness_text_api.c:112:5
+    #3 0xaaaad938711c in main /work/src/harness_text_api.c:224:17
+    #4 0xffffaef384c0  (/lib/aarch64-linux-gnu/libc.so.6+0x284c0) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #5 0xffffaef38594 in __libc_start_main (/lib/aarch64-linux-gnu/libc.so.6+0x28594) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #6 0xaaaad92aa76c in _start (/work/png_fuzz_api+0x3a76c) (BuildId: 21d8426ee6b9a463676b7110d0ac10be1fa04185)
+
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /build/libpng-instrumented/pngset.c in png_set_text_2
+==61==ABORTING
+exit=134
+=== triage-artifacts/local/findings-api-cve-212823/worker2/crashes/id:000000,sig:11,src:000000,time:764,execs:263,op:havoc,rep:4 ===
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+==66==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000000 (pc 0xaaaae07106c4 bp 0xffffe94bc160 sp 0xffffe94bc130 T0)
+==66==The signal is caused by a WRITE memory access.
+==66==Hint: address points to the zero page.
+    #0 0xaaaae07106c4 in png_set_text_2 /build/libpng-instrumented/pngset.c
+    #1 0xaaaae0710348 in png_set_text /build/libpng-instrumented/pngset.c:654:10
+    #2 0xaaaae0707c28 in target_text_api /work/src/harness_text_api.c:112:5
+    #3 0xaaaae070711c in main /work/src/harness_text_api.c:224:17
+    #4 0xffff9d5884c0  (/lib/aarch64-linux-gnu/libc.so.6+0x284c0) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #5 0xffff9d588594 in __libc_start_main (/lib/aarch64-linux-gnu/libc.so.6+0x28594) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #6 0xaaaae062a76c in _start (/work/png_fuzz_api+0x3a76c) (BuildId: 21d8426ee6b9a463676b7110d0ac10be1fa04185)
+
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /build/libpng-instrumented/pngset.c in png_set_text_2
+==66==ABORTING
+exit=134
+=== triage-artifacts/local/findings-api-cve-212823/worker2/crashes/id:000001,sig:11,src:000000,time:1362,execs:468,op:havoc,rep:3 ===
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+==71==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000000 (pc 0xaaaad77a06c4 bp 0xfffff965d280 sp 0xfffff965d250 T0)
+==71==The signal is caused by a WRITE memory access.
+==71==Hint: address points to the zero page.
+    #0 0xaaaad77a06c4 in png_set_text_2 /build/libpng-instrumented/pngset.c
+    #1 0xaaaad77a0348 in png_set_text /build/libpng-instrumented/pngset.c:654:10
+    #2 0xaaaad7797c28 in target_text_api /work/src/harness_text_api.c:112:5
+    #3 0xaaaad779711c in main /work/src/harness_text_api.c:224:17
+    #4 0xffffb3bd84c0  (/lib/aarch64-linux-gnu/libc.so.6+0x284c0) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #5 0xffffb3bd8594 in __libc_start_main (/lib/aarch64-linux-gnu/libc.so.6+0x28594) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #6 0xaaaad76ba76c in _start (/work/png_fuzz_api+0x3a76c) (BuildId: 21d8426ee6b9a463676b7110d0ac10be1fa04185)
+
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /build/libpng-instrumented/pngset.c in png_set_text_2
+==71==ABORTING
+exit=134
+=== triage-artifacts/local/findings-api-cve-212823/worker2/crashes/id:000002,sig:11,src:000000,time:1492,execs:509,op:havoc,rep:1 ===
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+==76==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000000 (pc 0xaaaac49406c4 bp 0xffffde0cab40 sp 0xffffde0cab10 T0)
+==76==The signal is caused by a WRITE memory access.
+==76==Hint: address points to the zero page.
+    #0 0xaaaac49406c4 in png_set_text_2 /build/libpng-instrumented/pngset.c
+    #1 0xaaaac4940348 in png_set_text /build/libpng-instrumented/pngset.c:654:10
+    #2 0xaaaac4937c28 in target_text_api /work/src/harness_text_api.c:112:5
+    #3 0xaaaac493711c in main /work/src/harness_text_api.c:224:17
+    #4 0xffffa1b984c0  (/lib/aarch64-linux-gnu/libc.so.6+0x284c0) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #5 0xffffa1b98594 in __libc_start_main (/lib/aarch64-linux-gnu/libc.so.6+0x28594) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #6 0xaaaac485a76c in _start (/work/png_fuzz_api+0x3a76c) (BuildId: 21d8426ee6b9a463676b7110d0ac10be1fa04185)
+
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /build/libpng-instrumented/pngset.c in png_set_text_2
+==76==ABORTING
+exit=134
+=== triage-artifacts/local/findings-api-cve-212823/worker2/crashes/id:000003,sig:11,src:000000,time:2184,execs:741,op:havoc,rep:4 ===
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+==81==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000000 (pc 0xaaaae30706c4 bp 0xfffff768a400 sp 0xfffff768a3d0 T0)
+==81==The signal is caused by a WRITE memory access.
+==81==Hint: address points to the zero page.
+    #0 0xaaaae30706c4 in png_set_text_2 /build/libpng-instrumented/pngset.c
+    #1 0xaaaae3070348 in png_set_text /build/libpng-instrumented/pngset.c:654:10
+    #2 0xaaaae3067c28 in target_text_api /work/src/harness_text_api.c:112:5
+    #3 0xaaaae306711c in main /work/src/harness_text_api.c:224:17
+    #4 0xffffb3dc84c0  (/lib/aarch64-linux-gnu/libc.so.6+0x284c0) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #5 0xffffb3dc8594 in __libc_start_main (/lib/aarch64-linux-gnu/libc.so.6+0x28594) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #6 0xaaaae2f8a76c in _start (/work/png_fuzz_api+0x3a76c) (BuildId: 21d8426ee6b9a463676b7110d0ac10be1fa04185)
+
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /build/libpng-instrumented/pngset.c in png_set_text_2
+==81==ABORTING
+exit=134
+=== triage-artifacts/local/findings-api-cve-212823/worker2/crashes/id:000004,sig:06,src:000000,time:2525,execs:861,op:havoc,rep:3 ===
+exit=0
+=== triage-artifacts/local/findings-api-cve-212823/worker2/crashes/id:000005,sig:11,src:000000,time:5373,execs:1855,op:havoc,rep:4 ===
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+==90==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000000 (pc 0xaaaad3fd06c4 bp 0xffffed0e3d80 sp 0xffffed0e3d50 T0)
+==90==The signal is caused by a WRITE memory access.
+==90==Hint: address points to the zero page.
+    #0 0xaaaad3fd06c4 in png_set_text_2 /build/libpng-instrumented/pngset.c
+    #1 0xaaaad3fd0348 in png_set_text /build/libpng-instrumented/pngset.c:654:10
+    #2 0xaaaad3fc7c28 in target_text_api /work/src/harness_text_api.c:112:5
+    #3 0xaaaad3fc711c in main /work/src/harness_text_api.c:224:17
+    #4 0xffffb88084c0  (/lib/aarch64-linux-gnu/libc.so.6+0x284c0) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #5 0xffffb8808594 in __libc_start_main (/lib/aarch64-linux-gnu/libc.so.6+0x28594) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #6 0xaaaad3eea76c in _start (/work/png_fuzz_api+0x3a76c) (BuildId: 21d8426ee6b9a463676b7110d0ac10be1fa04185)
+
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /build/libpng-instrumented/pngset.c in png_set_text_2
+==90==ABORTING
+exit=134
+=== triage-artifacts/local/findings-api-cve-212823/worker2/crashes/id:000006,sig:06,src:000001,time:37908,execs:13131,op:havoc,rep:2 ===
+exit=0
+=== triage-artifacts/local/findings-api-cve-212823/worker2/crashes/id:000007,sig:11,src:000027,time:40620,execs:14076,op:havoc,rep:2 ===
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+==99==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000000 (pc 0xaaaab38e06c4 bp 0xffffff135500 sp 0xffffff1354d0 T0)
+==99==The signal is caused by a WRITE memory access.
+==99==Hint: address points to the zero page.
+    #0 0xaaaab38e06c4 in png_set_text_2 /build/libpng-instrumented/pngset.c
+    #1 0xaaaab38e0348 in png_set_text /build/libpng-instrumented/pngset.c:654:10
+    #2 0xaaaab38d7c28 in target_text_api /work/src/harness_text_api.c:112:5
+    #3 0xaaaab38d711c in main /work/src/harness_text_api.c:224:17
+    #4 0xffff832b84c0  (/lib/aarch64-linux-gnu/libc.so.6+0x284c0) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #5 0xffff832b8594 in __libc_start_main (/lib/aarch64-linux-gnu/libc.so.6+0x28594) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #6 0xaaaab37fa76c in _start (/work/png_fuzz_api+0x3a76c) (BuildId: 21d8426ee6b9a463676b7110d0ac10be1fa04185)
+
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /build/libpng-instrumented/pngset.c in png_set_text_2
+==99==ABORTING
+exit=134
+=== triage-artifacts/local/findings-api-cve-212823/worker2/crashes/id:000008,sig:11,src:000034,time:56578,execs:19476,op:havoc,rep:8 ===
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+==104==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000000 (pc 0xaaaad4d106c4 bp 0xfffffe4bd520 sp 0xfffffe4bd4f0 T0)
+==104==The signal is caused by a WRITE memory access.
+==104==Hint: address points to the zero page.
+    #0 0xaaaad4d106c4 in png_set_text_2 /build/libpng-instrumented/pngset.c
+    #1 0xaaaad4d10348 in png_set_text /build/libpng-instrumented/pngset.c:654:10
+    #2 0xaaaad4d07c28 in target_text_api /work/src/harness_text_api.c:112:5
+    #3 0xaaaad4d0711c in main /work/src/harness_text_api.c:224:17
+    #4 0xffff990484c0  (/lib/aarch64-linux-gnu/libc.so.6+0x284c0) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #5 0xffff99048594 in __libc_start_main (/lib/aarch64-linux-gnu/libc.so.6+0x28594) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #6 0xaaaad4c2a76c in _start (/work/png_fuzz_api+0x3a76c) (BuildId: 21d8426ee6b9a463676b7110d0ac10be1fa04185)
+
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /build/libpng-instrumented/pngset.c in png_set_text_2
+==104==ABORTING
+exit=134
+=== triage-artifacts/local/findings-api-cve-212823/worker2/crashes/id:000009,sig:06,src:000039,time:62295,execs:21377,op:havoc,rep:16 ===
+exit=0
+=== triage-artifacts/local/findings-api-cve-212823/worker2/crashes/id:000010,sig:06,src:000038,time:122256,execs:42121,op:havoc,rep:2 ===
+exit=0
+=== triage-artifacts/local/findings-api-cve-212823/worker3/crashes/id:000000,sig:11,src:000000,time:833,execs:282,op:havoc,rep:16 ===
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+==117==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000000 (pc 0xaaaac04706c4 bp 0xffffc2055ec0 sp 0xffffc2055e90 T0)
+==117==The signal is caused by a WRITE memory access.
+==117==Hint: address points to the zero page.
+    #0 0xaaaac04706c4 in png_set_text_2 /build/libpng-instrumented/pngset.c
+    #1 0xaaaac0470348 in png_set_text /build/libpng-instrumented/pngset.c:654:10
+    #2 0xaaaac0467c28 in target_text_api /work/src/harness_text_api.c:112:5
+    #3 0xaaaac046711c in main /work/src/harness_text_api.c:224:17
+    #4 0xffffb44084c0  (/lib/aarch64-linux-gnu/libc.so.6+0x284c0) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #5 0xffffb4408594 in __libc_start_main (/lib/aarch64-linux-gnu/libc.so.6+0x28594) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #6 0xaaaac038a76c in _start (/work/png_fuzz_api+0x3a76c) (BuildId: 21d8426ee6b9a463676b7110d0ac10be1fa04185)
+
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /build/libpng-instrumented/pngset.c in png_set_text_2
+==117==ABORTING
+exit=134
+=== triage-artifacts/local/findings-api-cve-212823/worker3/crashes/id:000001,sig:11,src:000000,time:1231,execs:415,op:havoc,rep:9 ===
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+==122==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000000 (pc 0xaaaac68306c4 bp 0xffffcf57bcc0 sp 0xffffcf57bc90 T0)
+==122==The signal is caused by a WRITE memory access.
+==122==Hint: address points to the zero page.
+    #0 0xaaaac68306c4 in png_set_text_2 /build/libpng-instrumented/pngset.c
+    #1 0xaaaac6830348 in png_set_text /build/libpng-instrumented/pngset.c:654:10
+    #2 0xaaaac6827c28 in target_text_api /work/src/harness_text_api.c:112:5
+    #3 0xaaaac682711c in main /work/src/harness_text_api.c:224:17
+    #4 0xffff859d84c0  (/lib/aarch64-linux-gnu/libc.so.6+0x284c0) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #5 0xffff859d8594 in __libc_start_main (/lib/aarch64-linux-gnu/libc.so.6+0x28594) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #6 0xaaaac674a76c in _start (/work/png_fuzz_api+0x3a76c) (BuildId: 21d8426ee6b9a463676b7110d0ac10be1fa04185)
+
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /build/libpng-instrumented/pngset.c in png_set_text_2
+==122==ABORTING
+exit=134
+=== triage-artifacts/local/findings-api-cve-212823/worker3/crashes/id:000002,sig:11,src:000000,time:1399,execs:470,op:havoc,rep:13 ===
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+==127==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000000 (pc 0xaaaab90a06c4 bp 0xfffffeb1af60 sp 0xfffffeb1af30 T0)
+==127==The signal is caused by a WRITE memory access.
+==127==Hint: address points to the zero page.
+    #0 0xaaaab90a06c4 in png_set_text_2 /build/libpng-instrumented/pngset.c
+    #1 0xaaaab90a0348 in png_set_text /build/libpng-instrumented/pngset.c:654:10
+    #2 0xaaaab9097c28 in target_text_api /work/src/harness_text_api.c:112:5
+    #3 0xaaaab909711c in main /work/src/harness_text_api.c:224:17
+    #4 0xffff9f7384c0  (/lib/aarch64-linux-gnu/libc.so.6+0x284c0) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #5 0xffff9f738594 in __libc_start_main (/lib/aarch64-linux-gnu/libc.so.6+0x28594) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #6 0xaaaab8fba76c in _start (/work/png_fuzz_api+0x3a76c) (BuildId: 21d8426ee6b9a463676b7110d0ac10be1fa04185)
+
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /build/libpng-instrumented/pngset.c in png_set_text_2
+==127==ABORTING
+exit=134
+=== triage-artifacts/local/findings-api-cve-212823/worker3/crashes/id:000003,sig:11,src:000000,time:1837,execs:614,op:havoc,rep:14 ===
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+==132==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000000 (pc 0xaaaade3806c4 bp 0xffffe46aa760 sp 0xffffe46aa730 T0)
+==132==The signal is caused by a WRITE memory access.
+==132==Hint: address points to the zero page.
+    #0 0xaaaade3806c4 in png_set_text_2 /build/libpng-instrumented/pngset.c
+    #1 0xaaaade380348 in png_set_text /build/libpng-instrumented/pngset.c:654:10
+    #2 0xaaaade377c28 in target_text_api /work/src/harness_text_api.c:112:5
+    #3 0xaaaade37711c in main /work/src/harness_text_api.c:224:17
+    #4 0xffff89bf84c0  (/lib/aarch64-linux-gnu/libc.so.6+0x284c0) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #5 0xffff89bf8594 in __libc_start_main (/lib/aarch64-linux-gnu/libc.so.6+0x28594) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #6 0xaaaade29a76c in _start (/work/png_fuzz_api+0x3a76c) (BuildId: 21d8426ee6b9a463676b7110d0ac10be1fa04185)
+
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /build/libpng-instrumented/pngset.c in png_set_text_2
+==132==ABORTING
+exit=134
+=== triage-artifacts/local/findings-api-cve-212823/worker3/crashes/id:000004,sig:11,src:000000,time:2057,execs:688,op:havoc,rep:10 ===
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+==137==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000000 (pc 0xaaaaac1006c4 bp 0xffffd4532d00 sp 0xffffd4532cd0 T0)
+==137==The signal is caused by a WRITE memory access.
+==137==Hint: address points to the zero page.
+    #0 0xaaaaac1006c4 in png_set_text_2 /build/libpng-instrumented/pngset.c
+    #1 0xaaaaac100348 in png_set_text /build/libpng-instrumented/pngset.c:654:10
+    #2 0xaaaaac0f7c28 in target_text_api /work/src/harness_text_api.c:112:5
+    #3 0xaaaaac0f711c in main /work/src/harness_text_api.c:224:17
+    #4 0xffffb9c784c0  (/lib/aarch64-linux-gnu/libc.so.6+0x284c0) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #5 0xffffb9c78594 in __libc_start_main (/lib/aarch64-linux-gnu/libc.so.6+0x28594) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #6 0xaaaaac01a76c in _start (/work/png_fuzz_api+0x3a76c) (BuildId: 21d8426ee6b9a463676b7110d0ac10be1fa04185)
+
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /build/libpng-instrumented/pngset.c in png_set_text_2
+==137==ABORTING
+exit=134
+=== triage-artifacts/local/findings-api-cve-212823/worker3/crashes/id:000005,sig:06,src:000000,time:3447,execs:1165,op:havoc,rep:10 ===
+exit=0
+=== triage-artifacts/local/findings-api-cve-212823/worker3/crashes/id:000006,sig:11,src:000000,time:5330,execs:1813,op:havoc,rep:4 ===
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+==146==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000000 (pc 0xaaaaaf6606c4 bp 0xffffd55b61a0 sp 0xffffd55b6170 T0)
+==146==The signal is caused by a WRITE memory access.
+==146==Hint: address points to the zero page.
+    #0 0xaaaaaf6606c4 in png_set_text_2 /build/libpng-instrumented/pngset.c
+    #1 0xaaaaaf660348 in png_set_text /build/libpng-instrumented/pngset.c:654:10
+    #2 0xaaaaaf657c28 in target_text_api /work/src/harness_text_api.c:112:5
+    #3 0xaaaaaf65711c in main /work/src/harness_text_api.c:224:17
+    #4 0xffffabd684c0  (/lib/aarch64-linux-gnu/libc.so.6+0x284c0) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #5 0xffffabd68594 in __libc_start_main (/lib/aarch64-linux-gnu/libc.so.6+0x28594) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #6 0xaaaaaf57a76c in _start (/work/png_fuzz_api+0x3a76c) (BuildId: 21d8426ee6b9a463676b7110d0ac10be1fa04185)
+
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /build/libpng-instrumented/pngset.c in png_set_text_2
+==146==ABORTING
+exit=134
+=== triage-artifacts/local/findings-api-cve-212823/worker3/crashes/id:000007,sig:11,src:000000,time:12843,execs:4369,op:havoc,rep:15 ===
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+==151==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000000 (pc 0xaaaad69f06c4 bp 0xffffe4895720 sp 0xffffe48956f0 T0)
+==151==The signal is caused by a WRITE memory access.
+==151==Hint: address points to the zero page.
+    #0 0xaaaad69f06c4 in png_set_text_2 /build/libpng-instrumented/pngset.c
+    #1 0xaaaad69f0348 in png_set_text /build/libpng-instrumented/pngset.c:654:10
+    #2 0xaaaad69e7c28 in target_text_api /work/src/harness_text_api.c:112:5
+    #3 0xaaaad69e711c in main /work/src/harness_text_api.c:224:17
+    #4 0xffff9d8284c0  (/lib/aarch64-linux-gnu/libc.so.6+0x284c0) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #5 0xffff9d828594 in __libc_start_main (/lib/aarch64-linux-gnu/libc.so.6+0x28594) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #6 0xaaaad690a76c in _start (/work/png_fuzz_api+0x3a76c) (BuildId: 21d8426ee6b9a463676b7110d0ac10be1fa04185)
+
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /build/libpng-instrumented/pngset.c in png_set_text_2
+==151==ABORTING
+exit=134
+=== triage-artifacts/local/findings-api-cve-212823/worker3/crashes/id:000008,sig:06,src:000000,time:16334,execs:5541,op:havoc,rep:12 ===
+exit=0
+=== triage-artifacts/local/findings-api-cve-212823/worker3/crashes/id:000009,sig:06,src:000035,time:145468,execs:49163,op:havoc,rep:3 ===
+exit=0
+=== triage-artifacts/local/findings-api-cve-212823/worker3/crashes/id:000010,sig:11,src:000036,time:146981,execs:49674,op:quick,pos:2 ===
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+==164==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000000 (pc 0xaaaabf3406c4 bp 0xffffd53f03c0 sp 0xffffd53f0390 T0)
+==164==The signal is caused by a WRITE memory access.
+==164==Hint: address points to the zero page.
+    #0 0xaaaabf3406c4 in png_set_text_2 /build/libpng-instrumented/pngset.c
+    #1 0xaaaabf340348 in png_set_text /build/libpng-instrumented/pngset.c:654:10
+    #2 0xaaaabf337c28 in target_text_api /work/src/harness_text_api.c:112:5
+    #3 0xaaaabf33711c in main /work/src/harness_text_api.c:224:17
+    #4 0xffffb4ec84c0  (/lib/aarch64-linux-gnu/libc.so.6+0x284c0) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #5 0xffffb4ec8594 in __libc_start_main (/lib/aarch64-linux-gnu/libc.so.6+0x28594) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #6 0xaaaabf25a76c in _start (/work/png_fuzz_api+0x3a76c) (BuildId: 21d8426ee6b9a463676b7110d0ac10be1fa04185)
+
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /build/libpng-instrumented/pngset.c in png_set_text_2
+==164==ABORTING
+exit=134
+=== triage-artifacts/local/findings-api-cve-212823/worker3/crashes/id:000011,sig:11,src:000037,time:150920,execs:51004,op:havoc,rep:52 ===
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+==169==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000000 (pc 0xaaaacb9b06c4 bp 0xffffe3a5d3c0 sp 0xffffe3a5d390 T0)
+==169==The signal is caused by a WRITE memory access.
+==169==Hint: address points to the zero page.
+    #0 0xaaaacb9b06c4 in png_set_text_2 /build/libpng-instrumented/pngset.c
+    #1 0xaaaacb9b0348 in png_set_text /build/libpng-instrumented/pngset.c:654:10
+    #2 0xaaaacb9a7c28 in target_text_api /work/src/harness_text_api.c:112:5
+    #3 0xaaaacb9a711c in main /work/src/harness_text_api.c:224:17
+    #4 0xffffb42884c0  (/lib/aarch64-linux-gnu/libc.so.6+0x284c0) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #5 0xffffb4288594 in __libc_start_main (/lib/aarch64-linux-gnu/libc.so.6+0x28594) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #6 0xaaaacb8ca76c in _start (/work/png_fuzz_api+0x3a76c) (BuildId: 21d8426ee6b9a463676b7110d0ac10be1fa04185)
+
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /build/libpng-instrumented/pngset.c in png_set_text_2
+==169==ABORTING
+exit=134
+=== triage-artifacts/local/findings-api-cve-212823/worker4/crashes/id:000000,sig:11,src:000000,time:2708,execs:921,op:havoc,rep:2 ===
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+==174==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000000 (pc 0xaaaaae9006c4 bp 0xffffdaca6da0 sp 0xffffdaca6d70 T0)
+==174==The signal is caused by a WRITE memory access.
+==174==Hint: address points to the zero page.
+    #0 0xaaaaae9006c4 in png_set_text_2 /build/libpng-instrumented/pngset.c
+    #1 0xaaaaae900348 in png_set_text /build/libpng-instrumented/pngset.c:654:10
+    #2 0xaaaaae8f7c28 in target_text_api /work/src/harness_text_api.c:112:5
+    #3 0xaaaaae8f711c in main /work/src/harness_text_api.c:224:17
+    #4 0xffffba5b84c0  (/lib/aarch64-linux-gnu/libc.so.6+0x284c0) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #5 0xffffba5b8594 in __libc_start_main (/lib/aarch64-linux-gnu/libc.so.6+0x28594) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #6 0xaaaaae81a76c in _start (/work/png_fuzz_api+0x3a76c) (BuildId: 21d8426ee6b9a463676b7110d0ac10be1fa04185)
+
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /build/libpng-instrumented/pngset.c in png_set_text_2
+==174==ABORTING
+exit=134
+=== triage-artifacts/local/findings-api-cve-212823/worker4/crashes/id:000001,sig:11,src:000000,time:4397,execs:1507,op:havoc,rep:2 ===
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+==179==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000000 (pc 0xaaaada1906c4 bp 0xffffd71acf40 sp 0xffffd71acf10 T0)
+==179==The signal is caused by a WRITE memory access.
+==179==Hint: address points to the zero page.
+    #0 0xaaaada1906c4 in png_set_text_2 /build/libpng-instrumented/pngset.c
+    #1 0xaaaada190348 in png_set_text /build/libpng-instrumented/pngset.c:654:10
+    #2 0xaaaada187c28 in target_text_api /work/src/harness_text_api.c:112:5
+    #3 0xaaaada18711c in main /work/src/harness_text_api.c:224:17
+    #4 0xffffa2f584c0  (/lib/aarch64-linux-gnu/libc.so.6+0x284c0) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #5 0xffffa2f58594 in __libc_start_main (/lib/aarch64-linux-gnu/libc.so.6+0x28594) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #6 0xaaaada0aa76c in _start (/work/png_fuzz_api+0x3a76c) (BuildId: 21d8426ee6b9a463676b7110d0ac10be1fa04185)
+
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /build/libpng-instrumented/pngset.c in png_set_text_2
+==179==ABORTING
+exit=134
+=== triage-artifacts/local/findings-api-cve-212823/worker4/crashes/id:000002,sig:11,src:000000,time:7945,execs:2726,op:havoc,rep:2 ===
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+==184==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000000 (pc 0xaaaaafa706c4 bp 0xffffc70735c0 sp 0xffffc7073590 T0)
+==184==The signal is caused by a WRITE memory access.
+==184==Hint: address points to the zero page.
+    #0 0xaaaaafa706c4 in png_set_text_2 /build/libpng-instrumented/pngset.c
+    #1 0xaaaaafa70348 in png_set_text /build/libpng-instrumented/pngset.c:654:10
+    #2 0xaaaaafa67c28 in target_text_api /work/src/harness_text_api.c:112:5
+    #3 0xaaaaafa6711c in main /work/src/harness_text_api.c:224:17
+    #4 0xffff8e7e84c0  (/lib/aarch64-linux-gnu/libc.so.6+0x284c0) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #5 0xffff8e7e8594 in __libc_start_main (/lib/aarch64-linux-gnu/libc.so.6+0x28594) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #6 0xaaaaaf98a76c in _start (/work/png_fuzz_api+0x3a76c) (BuildId: 21d8426ee6b9a463676b7110d0ac10be1fa04185)
+
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /build/libpng-instrumented/pngset.c in png_set_text_2
+==184==ABORTING
+exit=134
+=== triage-artifacts/local/findings-api-cve-212823/worker4/crashes/id:000003,sig:11,src:000000,time:30628,execs:10557,op:havoc,rep:2 ===
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+==189==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000000 (pc 0xaaaad7b706c4 bp 0xffffd8f59280 sp 0xffffd8f59250 T0)
+==189==The signal is caused by a WRITE memory access.
+==189==Hint: address points to the zero page.
+    #0 0xaaaad7b706c4 in png_set_text_2 /build/libpng-instrumented/pngset.c
+    #1 0xaaaad7b70348 in png_set_text /build/libpng-instrumented/pngset.c:654:10
+    #2 0xaaaad7b67c28 in target_text_api /work/src/harness_text_api.c:112:5
+    #3 0xaaaad7b6711c in main /work/src/harness_text_api.c:224:17
+    #4 0xffffb22b84c0  (/lib/aarch64-linux-gnu/libc.so.6+0x284c0) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #5 0xffffb22b8594 in __libc_start_main (/lib/aarch64-linux-gnu/libc.so.6+0x28594) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #6 0xaaaad7a8a76c in _start (/work/png_fuzz_api+0x3a76c) (BuildId: 21d8426ee6b9a463676b7110d0ac10be1fa04185)
+
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /build/libpng-instrumented/pngset.c in png_set_text_2
+==189==ABORTING
+exit=134
+=== triage-artifacts/local/findings-api-cve-212823/worker4/crashes/id:000004,sig:06,src:000001,time:38286,execs:13140,op:havoc,rep:7 ===
+exit=0
+=== triage-artifacts/local/findings-api-cve-212823/worker4/crashes/id:000005,sig:06,src:000001,time:38321,execs:13152,op:havoc,rep:14 ===
+exit=0
+=== triage-artifacts/local/findings-api-cve-212823/worker4/crashes/id:000006,sig:06,src:000001,time:39018,execs:13390,op:havoc,rep:5 ===
+exit=0
+=== triage-artifacts/local/findings-api-cve-212823/worker4/crashes/id:000007,sig:11,src:000001,time:39853,execs:13673,op:havoc,rep:4 ===
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+==206==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000000 (pc 0xaaaad3ad06c4 bp 0xffffccf07a80 sp 0xffffccf07a50 T0)
+==206==The signal is caused by a WRITE memory access.
+==206==Hint: address points to the zero page.
+    #0 0xaaaad3ad06c4 in png_set_text_2 /build/libpng-instrumented/pngset.c
+    #1 0xaaaad3ad0348 in png_set_text /build/libpng-instrumented/pngset.c:654:10
+    #2 0xaaaad3ac7c28 in target_text_api /work/src/harness_text_api.c:112:5
+    #3 0xaaaad3ac711c in main /work/src/harness_text_api.c:224:17
+    #4 0xffffb56184c0  (/lib/aarch64-linux-gnu/libc.so.6+0x284c0) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #5 0xffffb5618594 in __libc_start_main (/lib/aarch64-linux-gnu/libc.so.6+0x28594) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #6 0xaaaad39ea76c in _start (/work/png_fuzz_api+0x3a76c) (BuildId: 21d8426ee6b9a463676b7110d0ac10be1fa04185)
+
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /build/libpng-instrumented/pngset.c in png_set_text_2
+==206==ABORTING
+exit=134
+=== triage-artifacts/local/findings-api-cve-212823/worker4/crashes/id:000008,sig:11,src:000035,time:73029,execs:24711,op:quick,pos:2 ===
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+==211==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000000 (pc 0xaaaab45006c4 bp 0xffffd585e480 sp 0xffffd585e450 T0)
+==211==The signal is caused by a WRITE memory access.
+==211==Hint: address points to the zero page.
+    #0 0xaaaab45006c4 in png_set_text_2 /build/libpng-instrumented/pngset.c
+    #1 0xaaaab4500348 in png_set_text /build/libpng-instrumented/pngset.c:654:10
+    #2 0xaaaab44f7c28 in target_text_api /work/src/harness_text_api.c:112:5
+    #3 0xaaaab44f711c in main /work/src/harness_text_api.c:224:17
+    #4 0xffffb54484c0  (/lib/aarch64-linux-gnu/libc.so.6+0x284c0) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #5 0xffffb5448594 in __libc_start_main (/lib/aarch64-linux-gnu/libc.so.6+0x28594) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #6 0xaaaab441a76c in _start (/work/png_fuzz_api+0x3a76c) (BuildId: 21d8426ee6b9a463676b7110d0ac10be1fa04185)
+
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /build/libpng-instrumented/pngset.c in png_set_text_2
+==211==ABORTING
+exit=134
+=== triage-artifacts/local/findings-api-cve-212823/worker4/crashes/id:000009,sig:06,src:000035,time:103477,execs:35015,op:havoc,rep:2 ===
+exit=0
+=== triage-artifacts/local/findings-api-cve-212823/worker4/crashes/id:000010,sig:06,src:000038,time:146404,execs:49599,op:havoc,rep:7 ===
+exit=0
+=== triage-artifacts/local/findings-api-cve-212823/worker5/crashes/id:000000,sig:11,src:000000,time:218,execs:106,op:havoc,rep:11 ===
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+==224==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000000 (pc 0xaaaac8a406c4 bp 0xffffe65eed60 sp 0xffffe65eed30 T0)
+==224==The signal is caused by a WRITE memory access.
+==224==Hint: address points to the zero page.
+    #0 0xaaaac8a406c4 in png_set_text_2 /build/libpng-instrumented/pngset.c
+    #1 0xaaaac8a40348 in png_set_text /build/libpng-instrumented/pngset.c:654:10
+    #2 0xaaaac8a37c28 in target_text_api /work/src/harness_text_api.c:112:5
+    #3 0xaaaac8a3711c in main /work/src/harness_text_api.c:224:17
+    #4 0xffffbc2584c0  (/lib/aarch64-linux-gnu/libc.so.6+0x284c0) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #5 0xffffbc258594 in __libc_start_main (/lib/aarch64-linux-gnu/libc.so.6+0x28594) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #6 0xaaaac895a76c in _start (/work/png_fuzz_api+0x3a76c) (BuildId: 21d8426ee6b9a463676b7110d0ac10be1fa04185)
+
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /build/libpng-instrumented/pngset.c in png_set_text_2
+==224==ABORTING
+exit=134
+=== triage-artifacts/local/findings-api-cve-212823/worker5/crashes/id:000001,sig:06,src:000000,time:1004,execs:337,op:havoc,rep:16 ===
+exit=0
+=== triage-artifacts/local/findings-api-cve-212823/worker5/crashes/id:000002,sig:11,src:000000,time:1055,execs:354,op:havoc,rep:15 ===
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+==233==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000000 (pc 0xaaaacb3206c4 bp 0xfffff36f2f60 sp 0xfffff36f2f30 T0)
+==233==The signal is caused by a WRITE memory access.
+==233==Hint: address points to the zero page.
+    #0 0xaaaacb3206c4 in png_set_text_2 /build/libpng-instrumented/pngset.c
+    #1 0xaaaacb320348 in png_set_text /build/libpng-instrumented/pngset.c:654:10
+    #2 0xaaaacb317c28 in target_text_api /work/src/harness_text_api.c:112:5
+    #3 0xaaaacb31711c in main /work/src/harness_text_api.c:224:17
+    #4 0xffffba8684c0  (/lib/aarch64-linux-gnu/libc.so.6+0x284c0) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #5 0xffffba868594 in __libc_start_main (/lib/aarch64-linux-gnu/libc.so.6+0x28594) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #6 0xaaaacb23a76c in _start (/work/png_fuzz_api+0x3a76c) (BuildId: 21d8426ee6b9a463676b7110d0ac10be1fa04185)
+
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /build/libpng-instrumented/pngset.c in png_set_text_2
+==233==ABORTING
+exit=134
+=== triage-artifacts/local/findings-api-cve-212823/worker5/crashes/id:000003,sig:11,src:000000,time:1253,execs:419,op:havoc,rep:16 ===
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+==238==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000000 (pc 0xaaaace2c06c4 bp 0xfffff4dc33a0 sp 0xfffff4dc3370 T0)
+==238==The signal is caused by a WRITE memory access.
+==238==Hint: address points to the zero page.
+    #0 0xaaaace2c06c4 in png_set_text_2 /build/libpng-instrumented/pngset.c
+    #1 0xaaaace2c0348 in png_set_text /build/libpng-instrumented/pngset.c:654:10
+    #2 0xaaaace2b7c28 in target_text_api /work/src/harness_text_api.c:112:5
+    #3 0xaaaace2b711c in main /work/src/harness_text_api.c:224:17
+    #4 0xffff8f9a84c0  (/lib/aarch64-linux-gnu/libc.so.6+0x284c0) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #5 0xffff8f9a8594 in __libc_start_main (/lib/aarch64-linux-gnu/libc.so.6+0x28594) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #6 0xaaaace1da76c in _start (/work/png_fuzz_api+0x3a76c) (BuildId: 21d8426ee6b9a463676b7110d0ac10be1fa04185)
+
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /build/libpng-instrumented/pngset.c in png_set_text_2
+==238==ABORTING
+exit=134
+=== triage-artifacts/local/findings-api-cve-212823/worker5/crashes/id:000004,sig:11,src:000000,time:1581,execs:527,op:havoc,rep:16 ===
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+==243==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000000 (pc 0xaaaaeaa706c4 bp 0xffffeaf106e0 sp 0xffffeaf106b0 T0)
+==243==The signal is caused by a WRITE memory access.
+==243==Hint: address points to the zero page.
+    #0 0xaaaaeaa706c4 in png_set_text_2 /build/libpng-instrumented/pngset.c
+    #1 0xaaaaeaa70348 in png_set_text /build/libpng-instrumented/pngset.c:654:10
+    #2 0xaaaaeaa67c28 in target_text_api /work/src/harness_text_api.c:112:5
+    #3 0xaaaaeaa6711c in main /work/src/harness_text_api.c:224:17
+    #4 0xffff81a984c0  (/lib/aarch64-linux-gnu/libc.so.6+0x284c0) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #5 0xffff81a98594 in __libc_start_main (/lib/aarch64-linux-gnu/libc.so.6+0x28594) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #6 0xaaaaea98a76c in _start (/work/png_fuzz_api+0x3a76c) (BuildId: 21d8426ee6b9a463676b7110d0ac10be1fa04185)
+
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /build/libpng-instrumented/pngset.c in png_set_text_2
+==243==ABORTING
+exit=134
+=== triage-artifacts/local/findings-api-cve-212823/worker5/crashes/id:000005,sig:11,src:000000,time:2595,execs:868,op:havoc,rep:12 ===
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+==248==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000000 (pc 0xaaaad13906c4 bp 0xffffe613fe00 sp 0xffffe613fdd0 T0)
+==248==The signal is caused by a WRITE memory access.
+==248==Hint: address points to the zero page.
+    #0 0xaaaad13906c4 in png_set_text_2 /build/libpng-instrumented/pngset.c
+    #1 0xaaaad1390348 in png_set_text /build/libpng-instrumented/pngset.c:654:10
+    #2 0xaaaad1387c28 in target_text_api /work/src/harness_text_api.c:112:5
+    #3 0xaaaad138711c in main /work/src/harness_text_api.c:224:17
+    #4 0xffffb9de84c0  (/lib/aarch64-linux-gnu/libc.so.6+0x284c0) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #5 0xffffb9de8594 in __libc_start_main (/lib/aarch64-linux-gnu/libc.so.6+0x28594) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #6 0xaaaad12aa76c in _start (/work/png_fuzz_api+0x3a76c) (BuildId: 21d8426ee6b9a463676b7110d0ac10be1fa04185)
+
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /build/libpng-instrumented/pngset.c in png_set_text_2
+==248==ABORTING
+exit=134
+=== triage-artifacts/local/findings-api-cve-212823/worker5/crashes/id:000006,sig:06,src:000000,time:3105,execs:1039,op:havoc,rep:12 ===
+exit=0
+=== triage-artifacts/local/findings-api-cve-212823/worker5/crashes/id:000007,sig:06,src:000000,time:4645,execs:1561,op:havoc,rep:16 ===
+exit=0
+=== triage-artifacts/local/findings-api-cve-212823/worker5/crashes/id:000008,sig:11,src:000036,time:57905,execs:19382,op:quick,pos:2 ===
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+==261==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000000 (pc 0xaaaad27e06c4 bp 0xffffebf6a420 sp 0xffffebf6a3f0 T0)
+==261==The signal is caused by a WRITE memory access.
+==261==Hint: address points to the zero page.
+    #0 0xaaaad27e06c4 in png_set_text_2 /build/libpng-instrumented/pngset.c
+    #1 0xaaaad27e0348 in png_set_text /build/libpng-instrumented/pngset.c:654:10
+    #2 0xaaaad27d7c28 in target_text_api /work/src/harness_text_api.c:112:5
+    #3 0xaaaad27d711c in main /work/src/harness_text_api.c:224:17
+    #4 0xffffad5684c0  (/lib/aarch64-linux-gnu/libc.so.6+0x284c0) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #5 0xffffad568594 in __libc_start_main (/lib/aarch64-linux-gnu/libc.so.6+0x28594) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #6 0xaaaad26fa76c in _start (/work/png_fuzz_api+0x3a76c) (BuildId: 21d8426ee6b9a463676b7110d0ac10be1fa04185)
+
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /build/libpng-instrumented/pngset.c in png_set_text_2
+==261==ABORTING
+exit=134
+=== triage-artifacts/local/findings-api-cve-212823/worker5/crashes/id:000009,sig:06,src:000036,time:59163,execs:19804,op:havoc,rep:8 ===
+exit=0
+=== triage-artifacts/local/findings-api-cve-212823/worker5/crashes/id:000010,sig:06,src:000042,time:124251,execs:41488,op:havoc,rep:1 ===
+exit=0
+=== triage-artifacts/local/findings-api-cve-212823/worker6/crashes/id:000000,sig:11,src:000000,time:673,execs:232,op:int32,pos:0,val:-128 ===
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+==274==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000000 (pc 0xaaaabcf706c4 bp 0xffffc7ce1660 sp 0xffffc7ce1630 T0)
+==274==The signal is caused by a WRITE memory access.
+==274==Hint: address points to the zero page.
+    #0 0xaaaabcf706c4 in png_set_text_2 /build/libpng-instrumented/pngset.c
+    #1 0xaaaabcf70348 in png_set_text /build/libpng-instrumented/pngset.c:654:10
+    #2 0xaaaabcf67c28 in target_text_api /work/src/harness_text_api.c:112:5
+    #3 0xaaaabcf6711c in main /work/src/harness_text_api.c:224:17
+    #4 0xffff91d584c0  (/lib/aarch64-linux-gnu/libc.so.6+0x284c0) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #5 0xffff91d58594 in __libc_start_main (/lib/aarch64-linux-gnu/libc.so.6+0x28594) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #6 0xaaaabce8a76c in _start (/work/png_fuzz_api+0x3a76c) (BuildId: 21d8426ee6b9a463676b7110d0ac10be1fa04185)
+
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /build/libpng-instrumented/pngset.c in png_set_text_2
+==274==ABORTING
+exit=134
+=== triage-artifacts/local/findings-api-cve-212823/worker6/crashes/id:000001,sig:11,src:000000,time:1124,execs:378,op:havoc,rep:2 ===
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+==279==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000000 (pc 0xaaaad95506c4 bp 0xffffe23f5580 sp 0xffffe23f5550 T0)
+==279==The signal is caused by a WRITE memory access.
+==279==Hint: address points to the zero page.
+    #0 0xaaaad95506c4 in png_set_text_2 /build/libpng-instrumented/pngset.c
+    #1 0xaaaad9550348 in png_set_text /build/libpng-instrumented/pngset.c:654:10
+    #2 0xaaaad9547c28 in target_text_api /work/src/harness_text_api.c:112:5
+    #3 0xaaaad954711c in main /work/src/harness_text_api.c:224:17
+    #4 0xffffa1e684c0  (/lib/aarch64-linux-gnu/libc.so.6+0x284c0) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #5 0xffffa1e68594 in __libc_start_main (/lib/aarch64-linux-gnu/libc.so.6+0x28594) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #6 0xaaaad946a76c in _start (/work/png_fuzz_api+0x3a76c) (BuildId: 21d8426ee6b9a463676b7110d0ac10be1fa04185)
+
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /build/libpng-instrumented/pngset.c in png_set_text_2
+==279==ABORTING
+exit=134
+=== triage-artifacts/local/findings-api-cve-212823/worker6/crashes/id:000002,sig:11,src:000000,time:2302,execs:769,op:havoc,rep:6 ===
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+==284==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000000 (pc 0xaaaaca4206c4 bp 0xffffefde1aa0 sp 0xffffefde1a70 T0)
+==284==The signal is caused by a WRITE memory access.
+==284==Hint: address points to the zero page.
+    #0 0xaaaaca4206c4 in png_set_text_2 /build/libpng-instrumented/pngset.c
+    #1 0xaaaaca420348 in png_set_text /build/libpng-instrumented/pngset.c:654:10
+    #2 0xaaaaca417c28 in target_text_api /work/src/harness_text_api.c:112:5
+    #3 0xaaaaca41711c in main /work/src/harness_text_api.c:224:17
+    #4 0xffff933584c0  (/lib/aarch64-linux-gnu/libc.so.6+0x284c0) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #5 0xffff93358594 in __libc_start_main (/lib/aarch64-linux-gnu/libc.so.6+0x28594) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #6 0xaaaaca33a76c in _start (/work/png_fuzz_api+0x3a76c) (BuildId: 21d8426ee6b9a463676b7110d0ac10be1fa04185)
+
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /build/libpng-instrumented/pngset.c in png_set_text_2
+==284==ABORTING
+exit=134
+=== triage-artifacts/local/findings-api-cve-212823/worker6/crashes/id:000003,sig:11,src:000000,time:3355,execs:1127,op:havoc,rep:7 ===
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+==289==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000000 (pc 0xaaaad91a06c4 bp 0xffffd60b8d20 sp 0xffffd60b8cf0 T0)
+==289==The signal is caused by a WRITE memory access.
+==289==Hint: address points to the zero page.
+    #0 0xaaaad91a06c4 in png_set_text_2 /build/libpng-instrumented/pngset.c
+    #1 0xaaaad91a0348 in png_set_text /build/libpng-instrumented/pngset.c:654:10
+    #2 0xaaaad9197c28 in target_text_api /work/src/harness_text_api.c:112:5
+    #3 0xaaaad919711c in main /work/src/harness_text_api.c:224:17
+    #4 0xffffb65c84c0  (/lib/aarch64-linux-gnu/libc.so.6+0x284c0) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #5 0xffffb65c8594 in __libc_start_main (/lib/aarch64-linux-gnu/libc.so.6+0x28594) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #6 0xaaaad90ba76c in _start (/work/png_fuzz_api+0x3a76c) (BuildId: 21d8426ee6b9a463676b7110d0ac10be1fa04185)
+
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /build/libpng-instrumented/pngset.c in png_set_text_2
+==289==ABORTING
+exit=134
+=== triage-artifacts/local/findings-api-cve-212823/worker6/crashes/id:000004,sig:11,src:000000,time:6367,execs:2142,op:havoc,rep:6 ===
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+==294==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000000 (pc 0xaaaae30f06c4 bp 0xffffea9d1c60 sp 0xffffea9d1c30 T0)
+==294==The signal is caused by a WRITE memory access.
+==294==Hint: address points to the zero page.
+    #0 0xaaaae30f06c4 in png_set_text_2 /build/libpng-instrumented/pngset.c
+    #1 0xaaaae30f0348 in png_set_text /build/libpng-instrumented/pngset.c:654:10
+    #2 0xaaaae30e7c28 in target_text_api /work/src/harness_text_api.c:112:5
+    #3 0xaaaae30e711c in main /work/src/harness_text_api.c:224:17
+    #4 0xffff7f6084c0  (/lib/aarch64-linux-gnu/libc.so.6+0x284c0) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #5 0xffff7f608594 in __libc_start_main (/lib/aarch64-linux-gnu/libc.so.6+0x28594) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #6 0xaaaae300a76c in _start (/work/png_fuzz_api+0x3a76c) (BuildId: 21d8426ee6b9a463676b7110d0ac10be1fa04185)
+
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /build/libpng-instrumented/pngset.c in png_set_text_2
+==294==ABORTING
+exit=134
+=== triage-artifacts/local/findings-api-cve-212823/worker6/crashes/id:000005,sig:11,src:000000,time:6633,execs:2229,op:havoc,rep:7 ===
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+==299==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000000 (pc 0xaaaabe9206c4 bp 0xffffe9d1faa0 sp 0xffffe9d1fa70 T0)
+==299==The signal is caused by a WRITE memory access.
+==299==Hint: address points to the zero page.
+    #0 0xaaaabe9206c4 in png_set_text_2 /build/libpng-instrumented/pngset.c
+    #1 0xaaaabe920348 in png_set_text /build/libpng-instrumented/pngset.c:654:10
+    #2 0xaaaabe917c28 in target_text_api /work/src/harness_text_api.c:112:5
+    #3 0xaaaabe91711c in main /work/src/harness_text_api.c:224:17
+    #4 0xffff915684c0  (/lib/aarch64-linux-gnu/libc.so.6+0x284c0) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #5 0xffff91568594 in __libc_start_main (/lib/aarch64-linux-gnu/libc.so.6+0x28594) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #6 0xaaaabe83a76c in _start (/work/png_fuzz_api+0x3a76c) (BuildId: 21d8426ee6b9a463676b7110d0ac10be1fa04185)
+
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /build/libpng-instrumented/pngset.c in png_set_text_2
+==299==ABORTING
+exit=134
+=== triage-artifacts/local/findings-api-cve-212823/worker6/crashes/id:000006,sig:06,src:000000,time:17631,execs:5923,op:havoc,rep:8 ===
+exit=0
+=== triage-artifacts/local/findings-api-cve-212823/worker6/crashes/id:000007,sig:06,src:000000,time:19345,execs:6501,op:havoc,rep:8 ===
+exit=0
+=== triage-artifacts/local/findings-api-cve-212823/worker6/crashes/id:000008,sig:11,src:000042,time:155572,execs:52339,op:havoc,rep:1 ===
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+==312==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000000 (pc 0xaaaae69706c4 bp 0xffffc726ccc0 sp 0xffffc726cc90 T0)
+==312==The signal is caused by a WRITE memory access.
+==312==Hint: address points to the zero page.
+    #0 0xaaaae69706c4 in png_set_text_2 /build/libpng-instrumented/pngset.c
+    #1 0xaaaae6970348 in png_set_text /build/libpng-instrumented/pngset.c:654:10
+    #2 0xaaaae6967c28 in target_text_api /work/src/harness_text_api.c:112:5
+    #3 0xaaaae696711c in main /work/src/harness_text_api.c:224:17
+    #4 0xffff98b384c0  (/lib/aarch64-linux-gnu/libc.so.6+0x284c0) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #5 0xffff98b38594 in __libc_start_main (/lib/aarch64-linux-gnu/libc.so.6+0x28594) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #6 0xaaaae688a76c in _start (/work/png_fuzz_api+0x3a76c) (BuildId: 21d8426ee6b9a463676b7110d0ac10be1fa04185)
+
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /build/libpng-instrumented/pngset.c in png_set_text_2
+==312==ABORTING
+exit=134
+=== triage-artifacts/local/findings-api-cve-212823/worker6/crashes/id:000009,sig:06,src:000042,time:157659,execs:53035,op:havoc,rep:3 ===
+exit=0
+=== triage-artifacts/local/findings-api-cve-212823/worker6/crashes/id:000010,sig:11,src:000040,time:175712,execs:59079,op:havoc,rep:4 ===
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+==321==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000000 (pc 0xaaaae92b06c4 bp 0xffffe4416160 sp 0xffffe4416130 T0)
+==321==The signal is caused by a WRITE memory access.
+==321==Hint: address points to the zero page.
+    #0 0xaaaae92b06c4 in png_set_text_2 /build/libpng-instrumented/pngset.c
+    #1 0xaaaae92b0348 in png_set_text /build/libpng-instrumented/pngset.c:654:10
+    #2 0xaaaae92a7c28 in target_text_api /work/src/harness_text_api.c:112:5
+    #3 0xaaaae92a711c in main /work/src/harness_text_api.c:224:17
+    #4 0xffffb62c84c0  (/lib/aarch64-linux-gnu/libc.so.6+0x284c0) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #5 0xffffb62c8594 in __libc_start_main (/lib/aarch64-linux-gnu/libc.so.6+0x28594) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #6 0xaaaae91ca76c in _start (/work/png_fuzz_api+0x3a76c) (BuildId: 21d8426ee6b9a463676b7110d0ac10be1fa04185)
+
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /build/libpng-instrumented/pngset.c in png_set_text_2
+==321==ABORTING
+exit=134
+=== triage-artifacts/local/findings-api-cve-212823/worker7/crashes/id:000000,sig:11,src:000000,time:1377,execs:460,op:havoc,rep:1 ===
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+==326==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000000 (pc 0xaaaab44d06c4 bp 0xffffef9e39e0 sp 0xffffef9e39b0 T0)
+==326==The signal is caused by a WRITE memory access.
+==326==Hint: address points to the zero page.
+    #0 0xaaaab44d06c4 in png_set_text_2 /build/libpng-instrumented/pngset.c
+    #1 0xaaaab44d0348 in png_set_text /build/libpng-instrumented/pngset.c:654:10
+    #2 0xaaaab44c7c28 in target_text_api /work/src/harness_text_api.c:112:5
+    #3 0xaaaab44c711c in main /work/src/harness_text_api.c:224:17
+    #4 0xffffa04684c0  (/lib/aarch64-linux-gnu/libc.so.6+0x284c0) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #5 0xffffa0468594 in __libc_start_main (/lib/aarch64-linux-gnu/libc.so.6+0x28594) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #6 0xaaaab43ea76c in _start (/work/png_fuzz_api+0x3a76c) (BuildId: 21d8426ee6b9a463676b7110d0ac10be1fa04185)
+
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /build/libpng-instrumented/pngset.c in png_set_text_2
+==326==ABORTING
+exit=134
+=== triage-artifacts/local/findings-api-cve-212823/worker7/crashes/id:000001,sig:11,src:000000,time:3804,execs:1278,op:havoc,rep:2 ===
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+==331==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000000 (pc 0xaaaaad5e06c4 bp 0xffffdfd89940 sp 0xffffdfd89910 T0)
+==331==The signal is caused by a WRITE memory access.
+==331==Hint: address points to the zero page.
+    #0 0xaaaaad5e06c4 in png_set_text_2 /build/libpng-instrumented/pngset.c
+    #1 0xaaaaad5e0348 in png_set_text /build/libpng-instrumented/pngset.c:654:10
+    #2 0xaaaaad5d7c28 in target_text_api /work/src/harness_text_api.c:112:5
+    #3 0xaaaaad5d711c in main /work/src/harness_text_api.c:224:17
+    #4 0xffff8ae984c0  (/lib/aarch64-linux-gnu/libc.so.6+0x284c0) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #5 0xffff8ae98594 in __libc_start_main (/lib/aarch64-linux-gnu/libc.so.6+0x28594) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #6 0xaaaaad4fa76c in _start (/work/png_fuzz_api+0x3a76c) (BuildId: 21d8426ee6b9a463676b7110d0ac10be1fa04185)
+
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /build/libpng-instrumented/pngset.c in png_set_text_2
+==331==ABORTING
+exit=134
+=== triage-artifacts/local/findings-api-cve-212823/worker7/crashes/id:000002,sig:11,src:000000,time:7129,execs:2393,op:havoc,rep:2 ===
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+==336==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000000 (pc 0xaaaac3e406c4 bp 0xfffffc013160 sp 0xfffffc013130 T0)
+==336==The signal is caused by a WRITE memory access.
+==336==Hint: address points to the zero page.
+    #0 0xaaaac3e406c4 in png_set_text_2 /build/libpng-instrumented/pngset.c
+    #1 0xaaaac3e40348 in png_set_text /build/libpng-instrumented/pngset.c:654:10
+    #2 0xaaaac3e37c28 in target_text_api /work/src/harness_text_api.c:112:5
+    #3 0xaaaac3e3711c in main /work/src/harness_text_api.c:224:17
+    #4 0xffff92b184c0  (/lib/aarch64-linux-gnu/libc.so.6+0x284c0) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #5 0xffff92b18594 in __libc_start_main (/lib/aarch64-linux-gnu/libc.so.6+0x28594) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #6 0xaaaac3d5a76c in _start (/work/png_fuzz_api+0x3a76c) (BuildId: 21d8426ee6b9a463676b7110d0ac10be1fa04185)
+
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /build/libpng-instrumented/pngset.c in png_set_text_2
+==336==ABORTING
+exit=134
+=== triage-artifacts/local/findings-api-cve-212823/worker7/crashes/id:000003,sig:11,src:000000,time:16714,execs:5608,op:havoc,rep:2 ===
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+==341==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000000 (pc 0xaaaaae1206c4 bp 0xffffe7d348c0 sp 0xffffe7d34890 T0)
+==341==The signal is caused by a WRITE memory access.
+==341==Hint: address points to the zero page.
+    #0 0xaaaaae1206c4 in png_set_text_2 /build/libpng-instrumented/pngset.c
+    #1 0xaaaaae120348 in png_set_text /build/libpng-instrumented/pngset.c:654:10
+    #2 0xaaaaae117c28 in target_text_api /work/src/harness_text_api.c:112:5
+    #3 0xaaaaae11711c in main /work/src/harness_text_api.c:224:17
+    #4 0xffffa65a84c0  (/lib/aarch64-linux-gnu/libc.so.6+0x284c0) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #5 0xffffa65a8594 in __libc_start_main (/lib/aarch64-linux-gnu/libc.so.6+0x28594) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #6 0xaaaaae03a76c in _start (/work/png_fuzz_api+0x3a76c) (BuildId: 21d8426ee6b9a463676b7110d0ac10be1fa04185)
+
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /build/libpng-instrumented/pngset.c in png_set_text_2
+==341==ABORTING
+exit=134
+=== triage-artifacts/local/findings-api-cve-212823/worker7/crashes/id:000004,sig:11,src:000000,time:36158,execs:12204,op:havoc,rep:2 ===
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+==346==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000000 (pc 0xaaaab19106c4 bp 0xffffc7756fc0 sp 0xffffc7756f90 T0)
+==346==The signal is caused by a WRITE memory access.
+==346==Hint: address points to the zero page.
+    #0 0xaaaab19106c4 in png_set_text_2 /build/libpng-instrumented/pngset.c
+    #1 0xaaaab1910348 in png_set_text /build/libpng-instrumented/pngset.c:654:10
+    #2 0xaaaab1907c28 in target_text_api /work/src/harness_text_api.c:112:5
+    #3 0xaaaab190711c in main /work/src/harness_text_api.c:224:17
+    #4 0xffffaad884c0  (/lib/aarch64-linux-gnu/libc.so.6+0x284c0) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #5 0xffffaad88594 in __libc_start_main (/lib/aarch64-linux-gnu/libc.so.6+0x28594) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #6 0xaaaab182a76c in _start (/work/png_fuzz_api+0x3a76c) (BuildId: 21d8426ee6b9a463676b7110d0ac10be1fa04185)
+
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /build/libpng-instrumented/pngset.c in png_set_text_2
+==346==ABORTING
+exit=134
+=== triage-artifacts/local/findings-api-cve-212823/worker7/crashes/id:000005,sig:06,src:000000,time:38465,execs:12961,op:havoc,rep:2 ===
+exit=0
+=== triage-artifacts/local/findings-api-cve-212823/worker7/crashes/id:000006,sig:06,src:000001,time:39022,execs:13148,op:havoc,rep:2 ===
+exit=0
+=== triage-artifacts/local/findings-api-cve-212823/worker7/crashes/id:000007,sig:06,src:000038,time:49676,execs:16679,op:havoc,rep:11 ===
+exit=0
+=== triage-artifacts/local/findings-api-cve-212823/worker7/crashes/id:000008,sig:06,src:000045,time:192947,execs:64328,op:havoc,rep:2 ===
+exit=0
+=== triage-artifacts/local/findings-api-cve-212823/worker7/crashes/id:000009,sig:06,src:000045,time:192997,execs:64345,op:havoc,rep:2 ===
+exit=0
+=== triage-artifacts/local/findings-api-cve-212823/worker7/crashes/id:000010,sig:11,src:000045,time:193084,execs:64375,op:havoc,rep:6 ===
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+==371==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000000 (pc 0xaaaaaff206c4 bp 0xffffc89b3900 sp 0xffffc89b38d0 T0)
+==371==The signal is caused by a WRITE memory access.
+==371==Hint: address points to the zero page.
+    #0 0xaaaaaff206c4 in png_set_text_2 /build/libpng-instrumented/pngset.c
+    #1 0xaaaaaff20348 in png_set_text /build/libpng-instrumented/pngset.c:654:10
+    #2 0xaaaaaff17c28 in target_text_api /work/src/harness_text_api.c:112:5
+    #3 0xaaaaaff1711c in main /work/src/harness_text_api.c:224:17
+    #4 0xffff96bf84c0  (/lib/aarch64-linux-gnu/libc.so.6+0x284c0) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #5 0xffff96bf8594 in __libc_start_main (/lib/aarch64-linux-gnu/libc.so.6+0x28594) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #6 0xaaaaafe3a76c in _start (/work/png_fuzz_api+0x3a76c) (BuildId: 21d8426ee6b9a463676b7110d0ac10be1fa04185)
+
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /build/libpng-instrumented/pngset.c in png_set_text_2
+==371==ABORTING
+exit=134
+=== triage-artifacts/local/findings-api-cve-212823/worker8/crashes/id:000000,sig:06,src:000000,time:240,execs:115,op:havoc,rep:2 ===
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+==376==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000000 (pc 0xaaaabc4106c4 bp 0xffffdbccfca0 sp 0xffffdbccfc70 T0)
+==376==The signal is caused by a WRITE memory access.
+==376==Hint: address points to the zero page.
+    #0 0xaaaabc4106c4 in png_set_text_2 /build/libpng-instrumented/pngset.c
+    #1 0xaaaabc410348 in png_set_text /build/libpng-instrumented/pngset.c:654:10
+    #2 0xaaaabc407c28 in target_text_api /work/src/harness_text_api.c:112:5
+    #3 0xaaaabc40711c in main /work/src/harness_text_api.c:224:17
+    #4 0xffffb8ad84c0  (/lib/aarch64-linux-gnu/libc.so.6+0x284c0) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #5 0xffffb8ad8594 in __libc_start_main (/lib/aarch64-linux-gnu/libc.so.6+0x28594) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #6 0xaaaabc32a76c in _start (/work/png_fuzz_api+0x3a76c) (BuildId: 21d8426ee6b9a463676b7110d0ac10be1fa04185)
+
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /build/libpng-instrumented/pngset.c in png_set_text_2
+==376==ABORTING
+exit=134
+=== triage-artifacts/local/findings-api-cve-212823/worker8/crashes/id:000001,sig:11,src:000000,time:2064,execs:696,op:havoc,rep:2 ===
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+==381==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000000 (pc 0xaaaae15f06c4 bp 0xffffd022e1a0 sp 0xffffd022e170 T0)
+==381==The signal is caused by a WRITE memory access.
+==381==Hint: address points to the zero page.
+    #0 0xaaaae15f06c4 in png_set_text_2 /build/libpng-instrumented/pngset.c
+    #1 0xaaaae15f0348 in png_set_text /build/libpng-instrumented/pngset.c:654:10
+    #2 0xaaaae15e7c28 in target_text_api /work/src/harness_text_api.c:112:5
+    #3 0xaaaae15e711c in main /work/src/harness_text_api.c:224:17
+    #4 0xffffb51484c0  (/lib/aarch64-linux-gnu/libc.so.6+0x284c0) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #5 0xffffb5148594 in __libc_start_main (/lib/aarch64-linux-gnu/libc.so.6+0x28594) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #6 0xaaaae150a76c in _start (/work/png_fuzz_api+0x3a76c) (BuildId: 21d8426ee6b9a463676b7110d0ac10be1fa04185)
+
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /build/libpng-instrumented/pngset.c in png_set_text_2
+==381==ABORTING
+exit=134
+=== triage-artifacts/local/findings-api-cve-212823/worker8/crashes/id:000002,sig:11,src:000000,time:2275,execs:769,op:havoc,rep:1 ===
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+==386==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000000 (pc 0xaaaab73f06c4 bp 0xffffd3edf8c0 sp 0xffffd3edf890 T0)
+==386==The signal is caused by a WRITE memory access.
+==386==Hint: address points to the zero page.
+    #0 0xaaaab73f06c4 in png_set_text_2 /build/libpng-instrumented/pngset.c
+    #1 0xaaaab73f0348 in png_set_text /build/libpng-instrumented/pngset.c:654:10
+    #2 0xaaaab73e7c28 in target_text_api /work/src/harness_text_api.c:112:5
+    #3 0xaaaab73e711c in main /work/src/harness_text_api.c:224:17
+    #4 0xffff903a84c0  (/lib/aarch64-linux-gnu/libc.so.6+0x284c0) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #5 0xffff903a8594 in __libc_start_main (/lib/aarch64-linux-gnu/libc.so.6+0x28594) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #6 0xaaaab730a76c in _start (/work/png_fuzz_api+0x3a76c) (BuildId: 21d8426ee6b9a463676b7110d0ac10be1fa04185)
+
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /build/libpng-instrumented/pngset.c in png_set_text_2
+==386==ABORTING
+exit=134
+=== triage-artifacts/local/findings-api-cve-212823/worker8/crashes/id:000003,sig:11,src:000000,time:5972,execs:2037,op:havoc,rep:2 ===
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+==391==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000000 (pc 0xaaaac56906c4 bp 0xffffdcf18e00 sp 0xffffdcf18dd0 T0)
+==391==The signal is caused by a WRITE memory access.
+==391==Hint: address points to the zero page.
+    #0 0xaaaac56906c4 in png_set_text_2 /build/libpng-instrumented/pngset.c
+    #1 0xaaaac5690348 in png_set_text /build/libpng-instrumented/pngset.c:654:10
+    #2 0xaaaac5687c28 in target_text_api /work/src/harness_text_api.c:112:5
+    #3 0xaaaac568711c in main /work/src/harness_text_api.c:224:17
+    #4 0xffffbf1484c0  (/lib/aarch64-linux-gnu/libc.so.6+0x284c0) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #5 0xffffbf148594 in __libc_start_main (/lib/aarch64-linux-gnu/libc.so.6+0x28594) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #6 0xaaaac55aa76c in _start (/work/png_fuzz_api+0x3a76c) (BuildId: 21d8426ee6b9a463676b7110d0ac10be1fa04185)
+
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /build/libpng-instrumented/pngset.c in png_set_text_2
+==391==ABORTING
+exit=134
+=== triage-artifacts/local/findings-api-cve-212823/worker8/crashes/id:000004,sig:11,src:000000,time:10875,execs:3715,op:havoc,rep:2 ===
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+==396==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000000 (pc 0xaaaaae2706c4 bp 0xffffc6b9e000 sp 0xffffc6b9dfd0 T0)
+==396==The signal is caused by a WRITE memory access.
+==396==Hint: address points to the zero page.
+    #0 0xaaaaae2706c4 in png_set_text_2 /build/libpng-instrumented/pngset.c
+    #1 0xaaaaae270348 in png_set_text /build/libpng-instrumented/pngset.c:654:10
+    #2 0xaaaaae267c28 in target_text_api /work/src/harness_text_api.c:112:5
+    #3 0xaaaaae26711c in main /work/src/harness_text_api.c:224:17
+    #4 0xffffae6c84c0  (/lib/aarch64-linux-gnu/libc.so.6+0x284c0) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #5 0xffffae6c8594 in __libc_start_main (/lib/aarch64-linux-gnu/libc.so.6+0x28594) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #6 0xaaaaae18a76c in _start (/work/png_fuzz_api+0x3a76c) (BuildId: 21d8426ee6b9a463676b7110d0ac10be1fa04185)
+
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /build/libpng-instrumented/pngset.c in png_set_text_2
+==396==ABORTING
+exit=134
+=== triage-artifacts/local/findings-api-cve-212823/worker8/crashes/id:000005,sig:11,src:000000,time:11551,execs:3950,op:havoc,rep:2 ===
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+==401==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000000 (pc 0xaaaad82f06c4 bp 0xffffc6a8ac20 sp 0xffffc6a8abf0 T0)
+==401==The signal is caused by a WRITE memory access.
+==401==Hint: address points to the zero page.
+    #0 0xaaaad82f06c4 in png_set_text_2 /build/libpng-instrumented/pngset.c
+    #1 0xaaaad82f0348 in png_set_text /build/libpng-instrumented/pngset.c:654:10
+    #2 0xaaaad82e7c28 in target_text_api /work/src/harness_text_api.c:112:5
+    #3 0xaaaad82e711c in main /work/src/harness_text_api.c:224:17
+    #4 0xffff817f84c0  (/lib/aarch64-linux-gnu/libc.so.6+0x284c0) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #5 0xffff817f8594 in __libc_start_main (/lib/aarch64-linux-gnu/libc.so.6+0x28594) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #6 0xaaaad820a76c in _start (/work/png_fuzz_api+0x3a76c) (BuildId: 21d8426ee6b9a463676b7110d0ac10be1fa04185)
+
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /build/libpng-instrumented/pngset.c in png_set_text_2
+==401==ABORTING
+exit=134
+=== triage-artifacts/local/findings-api-cve-212823/worker8/crashes/id:000006,sig:06,src:000001,time:38455,execs:13166,op:havoc,rep:3 ===
+exit=0
+=== triage-artifacts/local/findings-api-cve-212823/worker8/crashes/id:000007,sig:11,src:000001,time:38781,execs:13278,op:havoc,rep:4 ===
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+==410==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000000 (pc 0xaaaad0a006c4 bp 0xffffe1b983c0 sp 0xffffe1b98390 T0)
+==410==The signal is caused by a WRITE memory access.
+==410==Hint: address points to the zero page.
+    #0 0xaaaad0a006c4 in png_set_text_2 /build/libpng-instrumented/pngset.c
+    #1 0xaaaad0a00348 in png_set_text /build/libpng-instrumented/pngset.c:654:10
+    #2 0xaaaad09f7c28 in target_text_api /work/src/harness_text_api.c:112:5
+    #3 0xaaaad09f711c in main /work/src/harness_text_api.c:224:17
+    #4 0xffffa2d584c0  (/lib/aarch64-linux-gnu/libc.so.6+0x284c0) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #5 0xffffa2d58594 in __libc_start_main (/lib/aarch64-linux-gnu/libc.so.6+0x28594) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #6 0xaaaad091a76c in _start (/work/png_fuzz_api+0x3a76c) (BuildId: 21d8426ee6b9a463676b7110d0ac10be1fa04185)
+
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /build/libpng-instrumented/pngset.c in png_set_text_2
+==410==ABORTING
+exit=134
+=== triage-artifacts/local/findings-api-cve-212823/worker8/crashes/id:000008,sig:11,src:000028,time:49279,execs:16798,op:havoc,rep:15 ===
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+==415==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000000 (pc 0xaaaab30506c4 bp 0xffffc980e4e0 sp 0xffffc980e4b0 T0)
+==415==The signal is caused by a WRITE memory access.
+==415==Hint: address points to the zero page.
+    #0 0xaaaab30506c4 in png_set_text_2 /build/libpng-instrumented/pngset.c
+    #1 0xaaaab3050348 in png_set_text /build/libpng-instrumented/pngset.c:654:10
+    #2 0xaaaab3047c28 in target_text_api /work/src/harness_text_api.c:112:5
+    #3 0xaaaab304711c in main /work/src/harness_text_api.c:224:17
+    #4 0xffffb15384c0  (/lib/aarch64-linux-gnu/libc.so.6+0x284c0) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #5 0xffffb1538594 in __libc_start_main (/lib/aarch64-linux-gnu/libc.so.6+0x28594) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #6 0xaaaab2f6a76c in _start (/work/png_fuzz_api+0x3a76c) (BuildId: 21d8426ee6b9a463676b7110d0ac10be1fa04185)
+
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /build/libpng-instrumented/pngset.c in png_set_text_2
+==415==ABORTING
+exit=134
+=== triage-artifacts/local/findings-api-cve-212823/worker8/crashes/id:000009,sig:06,src:000042,time:210667,execs:71475,op:havoc,rep:2 ===
+exit=0
+=== triage-artifacts/local/findings-api-cve-212823/worker8/crashes/id:000010,sig:11,src:000042,time:211877,execs:71877,op:havoc,rep:6 ===
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+==424==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000000 (pc 0xaaaae9f506c4 bp 0xfffffe445820 sp 0xfffffe4457f0 T0)
+==424==The signal is caused by a WRITE memory access.
+==424==Hint: address points to the zero page.
+    #0 0xaaaae9f506c4 in png_set_text_2 /build/libpng-instrumented/pngset.c
+    #1 0xaaaae9f50348 in png_set_text /build/libpng-instrumented/pngset.c:654:10
+    #2 0xaaaae9f47c28 in target_text_api /work/src/harness_text_api.c:112:5
+    #3 0xaaaae9f4711c in main /work/src/harness_text_api.c:224:17
+    #4 0xffffba7084c0  (/lib/aarch64-linux-gnu/libc.so.6+0x284c0) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #5 0xffffba708594 in __libc_start_main (/lib/aarch64-linux-gnu/libc.so.6+0x28594) (BuildId: d5ef86dde36cbd3289566cf5098226035d76f2e1)
+    #6 0xaaaae9e6a76c in _start (/work/png_fuzz_api+0x3a76c) (BuildId: 21d8426ee6b9a463676b7110d0ac10be1fa04185)
+
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /build/libpng-instrumented/pngset.c in png_set_text_2
+==424==ABORTING
+exit=134
+=== triage-artifacts/local/findings-api-cve-212823/worker8/crashes/id:000011,sig:06,src:000043,time:214548,execs:72763,op:havoc,rep:7 ===
+exit=0
