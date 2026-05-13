@@ -123,8 +123,9 @@ multi-\texttt{IDAT}/\texttt{hIST} cases. Small seeds keep mutation throughput
 high, while structural diversity starts AFL++ past the PNG signature and IHDR
 gate in several useful parser states.
 
-Reader campaigns use the AFL++ PNG dictionary with
-\texttt{-x /build/dictionaries/png.dict}. In language terms, PNG is a binary
+Reader campaigns use AFL++'s built-in PNG dictionary,
+\texttt{/build/dictionaries/png.dict}, originally attributed to Michal
+Zalewski, with \texttt{-x}. In language terms, PNG is a binary
 grammar of the form
 \(\mathit{File} \to \mathit{Signature}\ \mathit{Chunk}^{+}\), where each chunk
 is \texttt{length / type / data / CRC}. Dictionary tokens such as the PNG
@@ -307,7 +308,9 @@ a clean six-hour comparison.
 
 \subsection{Q8 --- Instrumentation Depth and Performance}
 For instrumentation depth, we compared a minimal libpng probe to the final
-decoder harness using short ASan-free AFL-instrumented runs.
+decoder harness using 30-second ASan-free AFL-instrumented runs. The probe is
+only a proxy for linked libpng instrumentation: it creates and destroys libpng
+state, but it is not a full parser campaign.
 
 \begin{table}[h]
 \centering
@@ -317,18 +320,17 @@ decoder harness using short ASan-free AFL-instrumented runs.
 \textbf{Binary} & \textbf{Reached} & \textbf{Total} & \textbf{Density} \\
 \midrule
 Minimal libpng probe & 49 & 3{,}090 & 1.59\% \\
-Final decoder harness & 638 & 3{,}130 & 20.38\% \\
+Final decoder harness & 808 & 3{,}130 & 25.81\% \\
 \bottomrule
 \end{tabular}
 \caption{Instrumented edge counts from \texttt{evidence/q8-edge-counts}.}
 \end{table}
 
 The total edge counts are close because both binaries link the same
-instrumented libpng archive. The reached counts diverge because the probe only
-creates and destroys libpng state, while the harness feeds PNG bytes through
-\texttt{png\_read\_info()}, transform setup, row allocation,
+instrumented libpng archive. The reached counts diverge because the harness
+feeds PNG bytes through \texttt{png\_read\_info()}, transform setup, row allocation,
 \texttt{png\_read\_image()}, and \texttt{png\_read\_end()}. Even the final
-harness reaches only 20.38\% in this short run; the rest sits behind validity
+harness reaches only 25.81\% in this short run; the rest sits behind validity
 constraints, rare chunk orderings, transform combinations, zlib states, error
 handlers, and APIs the decoder harness does not call.
 
@@ -339,21 +341,23 @@ handlers, and APIs the decoder harness does not call.
 \toprule
 \textbf{Configuration} & \textbf{Exec/s} & \textbf{Edges} & \textbf{Mode} \\
 \midrule
-No sanitizer + fork & 73.61 & 645 / 3{,}130 & fork \\
-ASan + fork & 62.80 & 642 / 3{,}129 & fork \\
-ASan + persistent & 81.99 & 656 / 3{,}138 & persistent \\
+No sanitizer + fork & 1{,}612.57 & 793 / 3{,}130 & fork \\
+ASan + fork & 684.78 & 752 / 3{,}129 & fork \\
+ASan + persistent & 1{,}799.32 & 788 / 3{,}138 & persistent \\
 \bottomrule
 \end{tabular}
-\caption{\texttt{afl-fuzz -V 10} speed measurements with the same decoder logic.}
+\caption{\texttt{afl-fuzz -V 30} speed measurements with the same decoder logic.}
 \end{table}
 
-These are short startup-window measurements, so the absolute speeds should not
-be over-read. The ordering still captures the tradeoff. Removing ASan avoids
-shadow-memory checks and raises fork-mode speed from 62.80 to 73.61 exec/s.
-Persistent mode keeps ASan but loops in-process through \texttt{\_\_AFL\_LOOP},
-removing most per-testcase process-startup cost; in this window it reached
-81.99 exec/s, about 30\% faster than ASan fork. The caveat is the same as in
-Q4: persistent-mode crashes need standalone replay before being called bugs.
+These 30-second fixed-window measurements are still short, so the absolute
+speeds should not be over-read. The ordering captures the tradeoff. Removing
+ASan avoids shadow-memory checks and raises fork-mode speed from 684.78 to
+1{,}612.57 exec/s. Persistent mode keeps ASan but loops in-process through
+\texttt{\_\_AFL\_LOOP}, removing most per-testcase process-startup cost; in
+this window it reached 1{,}799.32 exec/s, about 2.6 times ASan fork. The caveat
+is the same as in Q4: persistent-mode crashes need standalone replay before
+being called bugs. The persistent measurement also had slightly lower, but still
+high, stability at 99.87\% with four variable corpus entries.
 
 \section{Conclusion}
 The decoder harness reached meaningful libpng parser and row-processing code,
@@ -384,6 +388,8 @@ The main report numbers come from:
   \path{plot_output/}.
   \item QEMU campaign: \path{findings-qemu/default/} and
   \path{plot_output_qemu/}.
+  \item AFL++ status counters: \path{findings/default/fuzzer_stats} for Q4 and
+  \path{findings-qemu/default/fuzzer_stats} for Q7.
   \item Long supporting campaigns: \path{triage-artifacts/pwnbox/}.
   \item Q3 strategy yields: \path{evidence/q3-live/}.
   \item Q5 triage: \path{pocs/text_api_triage/}.

@@ -1,17 +1,17 @@
-start_time        : 1778576300
-last_update       : 1778576305
-run_time          : 5
-fuzzer_pid        : 1405
-cycles_done       : 3
-cycles_wo_finds   : 3
+start_time        : 1778687871
+last_update       : 1778687901
+run_time          : 30
+fuzzer_pid        : 17
+cycles_done       : 224
+cycles_wo_finds   : 224
 time_wo_finds     : 0
-fuzz_time         : 4
+fuzz_time         : 30
 calibration_time  : 0
 cmplog_time       : 0
 sync_time         : 0
 trim_time         : 0
-execs_done        : 970
-execs_per_sec     : 193.00
+execs_done        : 67461
+execs_per_sec     : 2248.10
 execs_ps_last_min : 0.00
 corpus_count      : 1
 corpus_favored    : 1
@@ -30,15 +30,15 @@ total_tmout       : 0
 last_find         : 0
 last_crash        : 0
 last_hang         : 0
-execs_since_crash : 970
-exec_timeout      : 40
+execs_since_crash : 67461
+exec_timeout      : 20
 slowest_exec_ms   : 0
 peak_rss_mb       : 0
-cpu_affinity      : 0
+cpu_affinity      : 13
 edges_found       : 49
 total_edges       : 3090
 var_byte_count    : 0
-havoc_expansion   : 3
+havoc_expansion   : 5
 auto_dict_entries : 0
 testcache_size    : 6
 testcache_count   : 1
@@ -46,4 +46,4 @@ testcache_evict   : 0
 afl_banner        : /work/evidence/q8-edge-counts/png_libpng_probe
 afl_version       : ++4.41a
 target_mode       : shmem_testcase default
-command_line      : afl-fuzz -V 5 -i /work/evidence/q8-edge-counts/seed-libpng-probe -o /work/evidence/q8-edge-counts/libpng-probe -- /work/evidence/q8-edge-counts/png_libpng_probe @@
+command_line      : afl-fuzz -V 30 -i /work/evidence/q8-edge-counts/seed-libpng-probe -o /work/evidence/q8-edge-counts/libpng-probe -- /work/evidence/q8-edge-counts/png_libpng_probe @@

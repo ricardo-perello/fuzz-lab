@@ -11,10 +11,11 @@ The Docker image builds cleanly end-to-end. Inside the container you have:
 - `afl-fuzz`, `afl-clang-fast`, `afl-qemu-trace`, `afl-tmin`, `afl-plot` on PATH
 - `/build/install/lib/libpng12.a` — libpng compiled with `afl-clang-fast` + ASan (instrumented)
 - `/build/install_vanilla/lib/libpng12.a` — libpng compiled with plain `gcc`, no sanitizers (for QEMU mode)
-- `/build/dictionaries/png.dict` — AFL++ PNG token dictionary
+- `/build/dictionaries/png.dict` — AFL++'s built-in PNG token dictionary, originally attributed to Michal Zalewski
 - `/build/Makefile` — all build and fuzz targets wired up
 
-**What's missing:** `src/harness.c`, `src/harness_persistent.c`, and at least one seed in `seeds/`.
+The completed repository includes the harnesses, seed corpus, campaign evidence,
+triage artifacts, and report source needed for the final submission.
 
 ---
 
@@ -25,7 +26,7 @@ The Docker image builds cleanly end-to-end. Inside the container you have:
 
 ---
 
-## First-time setup (everyone)
+## Docker Image Setup
 
 ```bash
 docker build -t fuzz-lab .
@@ -35,17 +36,18 @@ This takes ~10 minutes once and is cached after that. You only need to re-run it
 
 ---
 
-## Person B — Harness + Seeds
+## Harnesses and Seeds
 
-You need to create two files and populate one directory.
+The repository includes the main decoder harness, a persistent-mode variant,
+focused API harnesses, and a small PNG seed corpus.
 
 ### `src/harness.c`
 
-This is the entry point AFL++ drives. It must:
-1. Read a file from `argv[1]` (AFL++ passes `@@` which becomes the mutated input path)
-2. Feed it to libpng via the `png_set_read_fn()` callback API
-3. Call `png_read_info()` then `png_read_image()` to trigger the full parse pipeline
-4. Clean up and exit — no infinite loops, no interactive prompts
+This is the entry point AFL++ drives. It:
+1. Reads a file from `argv[1]` (AFL++ passes `@@`, which becomes the mutated input path)
+2. Feeds it to libpng via the `png_set_read_fn()` callback API
+3. Calls `png_read_info()` and `png_read_image()` to trigger the full parse pipeline
+4. Cleans up and exits without interactive prompts
 
 The typical libpng decode sequence (from the exercise guide):
 
@@ -72,7 +74,7 @@ png_read_end(png, NULL);
 png_destroy_read_struct(&png, &info, NULL);
 ```
 
-**Error handling:** libpng uses `setjmp`/`longjmp` for errors. You must set up a `setjmp` point after `png_create_read_struct` or the process will abort on any malformed input instead of returning, which breaks AFL++.
+**Error handling:** libpng uses `setjmp`/`longjmp` for errors. The harness sets up a `setjmp` point after `png_create_read_struct` so malformed inputs return cleanly instead of aborting the fuzzer process.
 
 ```c
 if (setjmp(png_jmpbuf(png))) {
@@ -97,15 +99,14 @@ while (__AFL_LOOP(1000)) {
 
 ### `seeds/`
 
-Put at least one valid PNG here. It **must** start with the 8-byte magic: `\x89PNG\r\n\x1a\n` — any file without this is rejected by libpng before any real parsing happens.
-
-Good options:
-- Grab a tiny PNG from anywhere (a 1×1 pixel PNG is fine and keeps mutation overhead low)
-- The smaller the better: AFL++ mutates seeds byte-by-byte, so a 67-byte minimal PNG reaches deep code faster than a 4MB photo
+The seed corpus contains ten small valid PNGs covering RGB, RGBA, grayscale,
+grayscale+alpha, indexed color, text metadata, Adam7 interlacing, and
+multi-IDAT cases. The seeds start with the 8-byte PNG magic
+`\x89PNG\r\n\x1a\n`, which gets AFL++ past libpng's early signature gate.
 
 ---
 
-## Workflow (everyone)
+## Docker Workflow
 
 Every session:
 
@@ -135,7 +136,7 @@ If `make build` fails, fix `src/harness.c` on your host machine and re-run `make
 
 ---
 
-## Person C — Campaigns + Report
+## Campaigns and Evidence
 
 ### Running campaigns
 
@@ -165,37 +166,37 @@ afl-plot findings/default plot_output
 afl-plot findings-qemu/default plot_output_qemu
 ```
 
-This generates `plot_output/index.html` with edges-over-time graphs. Take a screenshot of both the AFL++ status screen and the `afl-plot` output for the report appendix.
+This generates `plot_output/index.html` with edges-over-time graphs. The report appendix uses the generated plot artifacts plus the matching `fuzzer_stats` files as AFL++ status evidence.
 
-### Crash triage (Q5)
+### Crash triage evidence (Q5)
 
-If crashes are found in `findings/default/crashes/`:
+The reportable crash comes from the focused text API campaign, not the baseline
+decoder campaign. The original AFL++ crash corpus is under
+`triage-artifacts/local/findings-api-cve-212823/`, and the final reproducer,
+minimized input, ASan trace, `afl-tmin` output, and deduplication logs are under
+`pocs/text_api_triage/`.
+
+The triage flow used for the representative crash was:
 
 ```bash
-# minimize the crashing input to the smallest reproducer
-afl-tmin -i findings/default/crashes/<file> -o minimized.png -- ./png_fuzz @@
+# minimize the crashing input to the smallest reproducer with the text API harness
+afl-tmin -i <crash-file> -o minimized_input -- ./png_fuzz_api @@
 
 # get the ASan stack trace
-./png_fuzz minimized.png
+./png_fuzz_api minimized_input
 ```
-
-If no crashes are found, Q5 asks you to inject a synthetic bug, re-fuzz for 60 seconds, and show AFL++ catches it.
 
 ### Measuring exec speed for Q8
 
-Inside the container, run three back-to-back timing tests with the **same input**:
+The checked-in Q8 evidence was generated with the helper scripts:
 
 ```bash
-# 1. no sanitizer, fork mode  (build with gcc against vanilla library)
-# 2. ASan, fork mode          (default make build)
-# 3. ASan, persistent mode    (build src/harness_persistent.c with AFL_LOOP)
-
-afl-fuzz -i seeds -o /tmp/test1 -- ./png_fuzz_no_asan @@   # check exec/s at startup
-afl-fuzz -i seeds -o /tmp/test2 -- ./png_fuzz @@
-afl-fuzz -i seeds -o /tmp/test3 -- ./png_fuzz_persistent @@
+python3 scripts/measure_q8_edges.py --runtime 30
+python3 scripts/measure_q8_speed.py --runtime 30
 ```
 
-Read the `exec speed` line from each status screen and record the three numbers.
+The resulting `fuzzer_stats`, `plot_data`, and summary tables are stored under
+`evidence/q8-edge-counts/` and `evidence/q8-speed/`.
 
 ---
 
@@ -205,16 +206,18 @@ Read the `exec speed` line from each status screen and record the three numbers.
 Dockerfile              — builds the entire environment (do not edit unless dependencies change)
 Makefile                — all build and fuzz targets
 src/
-  harness.c             — (Person B) main fuzzing harness
-  harness_persistent.c  — (Person B) persistent-mode variant for Q8
+  harness.c             — main decoder fuzzing harness
+  harness_persistent.c  — persistent-mode decoder variant for Q8
 patches/
   libpng-1.2.56-no-crc.patch  — neutralizes CRC checks so mutations reach deep parser code
-seeds/                  — (Person B) seed PNG corpus
-dictionaries/           — png.dict, copied from AFL++ at image build time
-findings/               — instrumented campaign output (gitignored, created at runtime)
-findings-qemu/          — QEMU campaign output (gitignored, created at runtime)
+seeds/                  — seed PNG corpus
+dictionaries/           — png.dict, AFL++ built-in PNG dictionary originally attributed to Michal Zalewski
+findings/               — source-instrumented campaign evidence
+findings-qemu/          — QEMU campaign evidence
 plot_output/            — afl-plot output for instrumented campaign
 plot_output_qemu/       — afl-plot output for QEMU campaign
+pocs/text_api_triage/   — minimized text API crash reproducer and ASan evidence
+evidence/               — Q3 and Q8 supporting measurement artifacts
 ```
 
 ---

@@ -6,6 +6,7 @@ png_fuzz_progressive
 png_fuzz_api
 png_fuzz_write_api
 png_fuzz_metadata_api
+.vscode/
 report.aux
 report.fdb_latexmk
 report.fls
