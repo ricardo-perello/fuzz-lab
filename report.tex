@@ -23,14 +23,15 @@ EPFL --- Spring 2026
 
 \begin{abstract}
 We fuzzed \texttt{libpng} 1.2.56 with AFL++ using source instrumentation,
-QEMU mode, and persistent mode. The main decoder harness feeds AFL++ inputs
-through \texttt{png\_read\_info()}, transform setup, \texttt{png\_read\_image()},
-and \texttt{png\_read\_end()} with a CRC-neutralized libpng build and a small
-PNG seed corpus. The 32-minute ASan decoder run reached 966 of 3{,}122 edges
-and showed local saturation without decoder crashes. A focused text-API harness
-reproduced one CVE-2016-10087-style null-pointer dereference in
-\texttt{png\_set\_text\_2}; hangs and non-reproducing crash files are tracked
-separately.
+QEMU mode, persistent mode, and focused API harnesses. The required 30-minute
+decoder baselines exercise \texttt{png\_read\_info()}, transform setup,
+\texttt{png\_read\_image()}, and \texttt{png\_read\_end()} with a
+CRC-neutralized libpng build and a small PNG seed corpus. We then extended the
+campaign suite to persistent decoding, QEMU, metadata, write, and text API
+targets. The strongest confirmed finding is a minimized reproduction of the
+CVE-2016-10087 \texttt{png\_set\_text\_2} null-pointer dereference from the
+focused text-API harness; decoder hangs and non-reproducing crash files are
+tracked separately.
 \end{abstract}
 
 \section{Setup and Methodology}
@@ -46,9 +47,12 @@ The harnesses live in \texttt{src/}: \texttt{harness.c} is the main decoder,
 
 \textbf{Campaigns and artifacts.}
 The required source-instrumented and QEMU decoder campaigns both ran for just
-over 32 minutes. Longer supporting campaigns were also run for persistent
-decoding, write APIs, metadata APIs, text APIs, and QEMU long-run evidence.
-The compact evidence bundle under \texttt{triage-artifacts/} keeps
+over 32 minutes, giving the clean same-wall-clock evidence used in Q4 and Q7.
+The broader campaign suite was longer: persistent decoding, write APIs, and
+metadata APIs each ran for roughly six hours, and a longer QEMU decoder campaign
+ran for about 3 h 39 min. A separate focused text-API campaign produced the
+reproducible crash triaged in Q5. The compact
+evidence bundle under \texttt{triage-artifacts/} keeps
 \texttt{cmdline}, \texttt{fuzzer\_stats}, \texttt{plot\_data}, crashes, and
 hangs without the full AFL++ queues. Additional Q3 and Q8 evidence is stored
 under \texttt{evidence/}; crash-triage outputs are under
@@ -166,8 +170,10 @@ most combinations break global PNG consistency, but chunk-boundary
 recombinations can still expose new states.
 
 \subsection{Q4 --- Campaign Analysis}
-The canonical Q4 run is the ASan source-instrumented decoder campaign on the
-ten PNG seeds with the PNG dictionary, target \texttt{./png\_fuzz}.
+The Q4 baseline is the required ASan source-instrumented decoder campaign on
+the ten PNG seeds with the PNG dictionary, target \texttt{./png\_fuzz}. We use
+this 32-minute run because the lab asks for a 30+ minute instrumented campaign
+with AFL++ status counters and an \texttt{afl-plot} edge curve.
 
 \begin{table}[h]
 \centering
@@ -202,16 +208,22 @@ It is not full libpng saturation: 966 reached edges out of 3{,}122 instrumented
 edges leaves most code gated by semantic constraints, rarer transform
 combinations, error paths, and APIs not called by the decoder harness.
 
-Longer supporting campaigns confirm this picture. The persistent decoder
-campaign reached 1{,}088 / 3{,}131 edges (34.75\%) over roughly six hours, but
-its two saved crashes did not reproduce as standalone ASan faults and are
-therefore excluded. The write API campaign reached 558 / 2{,}090 edges with no
-crashes, and the clean metadata API campaign reached 458 / 3{,}388 edges with
-no crashes or hangs.
+Longer supporting campaigns show what extra budget and alternate entry points
+added beyond the required baseline. The persistent decoder campaign reached
+1{,}088 / 3{,}131 edges (34.75\%) over roughly six hours, improving coverage
+but producing two saved crashes that did not reproduce as standalone ASan
+faults. The longer QEMU decoder run reached 2{,}917 bitmap entries in about
+3 h 39 min. The write API campaign reached 558 / 2{,}090 edges with no crashes,
+and the clean metadata API campaign reached 458 / 3{,}388 edges with no crashes
+or hangs. These runs support the coverage story, while the confirmed bug comes
+from the focused text-API campaign triaged below.
 
 \subsection{Q5 --- Crash Triage}
-The reportable crash comes from the text API campaign rather than the baseline
-decoder. We selected one AFL++ crash from
+The reportable crash comes from the focused text API campaign rather than the
+baseline decoder. We triage it because Q5 asks for one real crash found by our
+fuzzing setup, and the text harness exercises a public libpng setter state
+sequence that the file decoder does not naturally reach. We selected one AFL++
+crash from
 \path{triage-artifacts/local/findings-api-cve-212823/main/crashes/} and
 replayed it with \texttt{./png\_fuzz\_api <input>}; the minimized reproducer,
 ASan trace, \texttt{afl-tmin} output, and deduplication logs are under
@@ -222,8 +234,8 @@ preserving the crash, a 92.31\% size reduction.
 The minimized input produces an ASan null-page write in libpng. The top stack
 frames are \texttt{png\_set\_text\_2()} in \texttt{pngset.c}, called by
 \texttt{png\_set\_text()} at \texttt{pngset.c:654}, then by our
-\texttt{target\_text\_api()} at \texttt{harness\_text\_api.c:112}. This matches
-the CVE-2016-10087-style bug class: libpng versions through 1.2.56 have a
+\texttt{target\_text\_api()} at \texttt{harness\_text\_api.c:112}. This
+reproduces the CVE-2016-10087 bug class: libpng versions through 1.2.56 have a
 null-pointer dereference in \texttt{png\_set\_text\_2()} when an application
 adds, removes, and re-adds text chunks.\footnote{\url{https://www.libpng.org/pub/png/libpng.html}}
 Our harness exercises that state sequence by calling \texttt{png\_set\_text()},
@@ -360,13 +372,14 @@ being called bugs. The persistent measurement also had slightly lower, but still
 high, stability at 99.87\% with four variable corpus entries.
 
 \section{Conclusion}
-The decoder harness reached meaningful libpng parser and row-processing code,
-and the focused API harnesses expanded testing into public setter and writer
-interfaces. The strongest confirmed finding is one text-API
-\texttt{png\_set\_text\_2} root cause. The main limitations are also clear:
-decoder hangs remain pending, persistent crashes were excluded as
-non-reproducing, and bitmap/edge numbers must only be compared within the same
-instrumentation source.
+The required 30-minute decoder campaigns provide the clean baseline evidence
+for Q4 and Q7, while the longer campaigns show how additional budget and entry
+points affected coverage. The focused API harnesses expanded testing into
+public setter and writer interfaces, and the strongest confirmed finding is one
+text-API \texttt{png\_set\_text\_2} root cause reproducing the CVE-2016-10087
+bug class. The main limitations are also clear: decoder hangs remain pending,
+persistent crashes were excluded as non-reproducing, and bitmap/edge numbers
+must only be compared within the same instrumentation source.
 
 \appendix
 \section{Evidence Artifacts}
@@ -382,6 +395,52 @@ instrumentation source.
 \caption{Baseline QEMU decoder edges over time.}
 \end{figure}
 
+\begin{figure}[h]
+\centering
+\includegraphics[width=\linewidth]{evidence/plots/persistent-decoder-main/edges.png}
+\caption{Long persistent decoder campaign edges over time.}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\linewidth]{evidence/plots/qemu-long-main/edges.png}
+\caption{Long QEMU decoder campaign edges over time.}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\linewidth]{evidence/plots/write-api-main/edges.png}
+\caption{Long write-API campaign edges over time.}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\linewidth]{evidence/plots/metadata-api-main/edges.png}
+\caption{Long metadata-API campaign edges over time.}
+\end{figure}
+
+Table~\ref{tab:supporting-campaigns} summarizes the longer and focused runs
+referenced from the body.
+\begin{table*}[t]
+\centering
+\small
+\begin{tabular}{lrrl}
+\toprule
+\textbf{Supporting run} & \textbf{Runtime} & \textbf{Edges} & \textbf{Outcome} \\
+\midrule
+Persistent decoder & 6.0 h & 1{,}088 / 3{,}131 & 2 crash files, non-repro \\
+Long QEMU decoder & 3.6 h & 2{,}917 / 65{,}536 & 0 crashes \\
+Write API & 6.0 h & 558 / 2{,}090 & 0 crashes \\
+Metadata API & 6.0 h & 458 / 3{,}388 & 0 crashes \\
+Text API & 5 min & 241 / 3{,}227 & 90 saved, 59 repro \\
+\bottomrule
+\end{tabular}
+\caption{Long and focused supporting campaign summary. Edge counts are from
+the main fuzzer instance for each campaign; text-API crash counts are from the
+deduplicated replay logs.}
+\label{tab:supporting-campaigns}
+\end{table*}
+
 The main report numbers come from:
 \begin{itemize}[leftmargin=*]
   \item Instrumented campaign: \path{findings/default/} and
@@ -390,7 +449,8 @@ The main report numbers come from:
   \path{plot_output_qemu/}.
   \item AFL++ status counters: \path{findings/default/fuzzer_stats} for Q4 and
   \path{findings-qemu/default/fuzzer_stats} for Q7.
-  \item Long supporting campaigns: \path{triage-artifacts/pwnbox/}.
+  \item Long supporting campaigns: \path{triage-artifacts/} and
+  \path{evidence/plots/}.
   \item Q3 strategy yields: \path{evidence/q3-live/}.
   \item Q5 triage: \path{pocs/text_api_triage/}.
   \item Q8 edge counts: \path{evidence/q8-edge-counts/}.
