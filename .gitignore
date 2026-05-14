@@ -12,7 +12,6 @@ report.fdb_latexmk
 report.fls
 report.log
 report.out
-report.pdf
 findings-no-asan/
 findings-progressive/
 findings-progressive-smoke/
